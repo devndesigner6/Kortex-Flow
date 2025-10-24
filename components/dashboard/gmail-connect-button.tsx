@@ -95,3 +95,4 @@ export function GmailConnectButton({ isConnected }: GmailConnectButtonProps) {
     </div>
   )
 }
+
