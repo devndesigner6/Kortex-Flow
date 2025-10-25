@@ -1,0 +1,59 @@
+/* Home page styles */
+.home-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-grid {
+    display: grid;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+@media (min-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.header {
+    background: linear-gradient(90deg, #6c63ff, #836fff);
+    color: white;
+    padding: 20px;
+    font-size: 1.8rem;
+}
+
+.card-grid {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 40px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    width: 220px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.footer {
+    margin-top: 50px;
+    padding: 20px;
+    background: #222;
+    color: #fff;
+}
