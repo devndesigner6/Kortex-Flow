@@ -4,14 +4,14 @@ KortexFlow reimagines personal productivity.
 Your inbox shouldn’t be your to-do list — yet today, that’s exactly what happens. Emails hide tasks. Meeting invites drown in noise. Deadlines slip.
 
 KortexFlow is your intelligent command center that:
-✅ Connects to Gmail & Google Calendar
-✅ Understands emails using AI
-✅ Detects tasks, deadlines & meetings automatically
-✅ Converts chaos into an actionable personal workflow
+ ->Connects to Gmail & Google Calendar
+ ->Understands emails using AI
+ ->Detects tasks, deadlines & meetings automatically
+ ->Converts chaos into an actionable personal workflow
 
-No more digging through emails — KortexFlow tells you:
+No more digging through emails - KortexFlow tells you:
 
-“Here’s what you need to do — and when.”
+“Here’s what you need to do - and when.”
 
 ✨ Core Features
 Feature	Status	Description
@@ -127,9 +127,4 @@ No data stored without explicit user consent
 
 Your inbox. Your tasks. Your control.
 
-🛰️ Project Roadmap
-Phase	Focus	Status
-Phase 1	Smart inbox → Task extraction	✅ Complete
-Phase 2	Calendar sync + notifications	✅ Complete
-Phase 3	Blockchain reward system	🚧 In Progress
-Phase 4	Cross-platform experience	🔜 Coming Soon
+
