@@ -1,76 +1,135 @@
-# KortexFlow
+🚀 KortexFlow – Your AI-Powered Productivity Command Center
 
-This starter React project has been generated using AlgoKit. See below for default getting started instructions.
+KortexFlow reimagines personal productivity.
+Your inbox shouldn’t be your to-do list — yet today, that’s exactly what happens. Emails hide tasks. Meeting invites drown in noise. Deadlines slip.
 
-# Setup
+KortexFlow is your intelligent command center that:
+✅ Connects to Gmail & Google Calendar
+✅ Understands emails using AI
+✅ Detects tasks, deadlines & meetings automatically
+✅ Converts chaos into an actionable personal workflow
 
-### Initial Setup
+No more digging through emails — KortexFlow tells you:
 
-#### 1. Clone the Repository
-Start by cloning this repository to your local machine.
+“Here’s what you need to do — and when.”
 
-#### 2. Install Pre-requisites
-Ensure the following pre-requisites are installed and properly configured:
+✨ Core Features
+Feature	Status	Description
+AI Task Extraction	✅	Detects action items & deadlines from emails
+Calendar Sync	✅	Auto-adds meetings with reminders
+Smart Dashboard	✅	Clear daily list of priorities
+Secure Account Authentication	✅	OAuth-based Gmail/Calendar access
+Blockchain-Backed Data Integrity	🚧 (WIP)	Algorand ASA + immutable activity ledger
+🧠 Why Blockchain?
 
-- **npm**: Node package manager. Install from [Node.js Installation Guide](https://nodejs.org/en/download/). Verify with `npm -v` to see version `18.12`+.
-- **AlgoKit CLI**: Essential for project setup and operations. Install the latest version from [AlgoKit CLI Installation Guide](https://github.com/algorandfoundation/algokit-cli#install). Verify installation with `algokit --version`, expecting `2.0.0` or later.
+Every task completed and commitment made becomes a verified, tamper-proof record.
 
-#### 3. Bootstrap Your Local Environment
-Run the following commands within the project folder:
+Integrity of productivity history
 
-- **Install Project Dependencies**: With `algokit project bootstrap all`, ensure all dependencies are ready.
+Proof-of-completion for collaborative workflows
 
-### Development Workflow
+Token-based reward ecosystems (future phase)
 
-#### Terminal
-Directly manage and interact with your project using AlgoKit commands:
+Built on Algorand for:
+⚡ Speed | ♻️ Sustainability | 🔒 Security
 
-1. **Build Contracts**: `algokit project run build` builds react web app and links with smart contracts in workspace, if any.
-2. Remaining set of command for linting, testing and deployment can be found in respective [package.json](./package.json) file and [.algokit.toml](./.algokit.toml) files.
+🛠 Tech Stack
+Frontend
 
-#### VS Code
-For a seamless experience with breakpoint debugging and other features:
+React.js (Vite)
 
-1. **Open Project**: In VS Code, open the repository root.
-2. **Install Extensions**: Follow prompts to install recommended extensions.
-3. **Debugging**:
-   - Use `F5` to start debugging.
-   - **Windows Users**: Select the Python interpreter at `./.venv/Scripts/python.exe` via `Ctrl/Cmd + Shift + P` > `Python: Select Interpreter` before the first run.
+ShadCN + TailwindCSS UI
 
-#### Other IDEs
-While primarily optimized for VS Code, Jetbrains WebStorm has base support for this project:
+Lucide Icons
 
-1. **Open Project**: In your JetBrains IDE, open the repository root.
-2. **Automatic Setup**: The IDE should configure the Python interpreter and virtual environment.
-3. **Debugging**: Use `Shift+F10` or `Ctrl+R` to start debugging. Note: Windows users may encounter issues with pre-launch tasks due to a known bug. See [JetBrains forums](https://youtrack.jetbrains.com/issue/IDEA-277486/Shell-script-configuration-cannot-run-as-before-launch-task) for workarounds.
+Backend
 
-## AlgoKit Workspaces and Project Management
-This project supports both standalone and monorepo setups through AlgoKit workspaces. Leverage [`algokit project run`](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) commands for efficient monorepo project orchestration and management across multiple projects within a workspace.
+Node.js / Express (API handling)
 
-> Please note, by default frontend is pre configured to run against Algorand LocalNet. If you want to run against TestNet or MainNet, comment out the current environment variable and uncomment the relevant one in [`.env`](.env) file that is created after running bootstrap command and based on [`.env.template`](.env.template).
+Gmail API + Google Calendar API
 
-# Algorand Wallet integrations
+AI Layer
 
-The template comes with [`use-wallet`](https://github.com/txnlab/use-wallet) integration, which provides a React hook for connecting to an Algorand wallet providers. The following wallet providers are included by default:
-- LocalNet:
-- - [KMD/Local Wallet](https://github.com/TxnLab/use-wallet#kmd-algorand-key-management-daemon) - Algorand's Key Management Daemon (KMD) is a service that manages Algorand private keys and signs transactions. Works best with AlgoKit LocalNet and allows you to easily test and interact with your dApps locally.
-- TestNet and others:
-- - [Pera Wallet](https://perawallet.app).
-- - [Defly Wallet](https://defly.app).
-- - [Exodus Wallet](https://www.exodus.com).
-- - [Daffi Wallet](https://www.daffi.me).
+LLM-powered email parsing + task extraction
 
-Refer to official [`use-wallet`](https://github.com/txnlab/use-wallet) documentation for detailed guidelines on how to integrate with other wallet providers (such as WalletConnect v2). Too see implementation details on the use wallet hook and initialization of extra wallet providers refer to [`App.tsx`](./src/App.tsx).
+Blockchain Layer (Algorand)
 
-# Tools
+AlgoKit for local dev + deployment
 
-This project makes use of React and Tailwind to provider a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
+Algorand Standard Assets (ASA) for reward tokens
 
-- [AlgoKit Utils](https://github.com/algorandfoundation/algokit-utils-ts) - Various TypeScript utilities to simplify interactions with Algorand and AlgoKit.
-- [React](https://reactjs.org/) - A JavaScript library for building user interfaces.
-- [use-wallet](https://github.com/txnlab/use-wallet) - A React hook for connecting to an Algorand wallet providers.
-- [npm](https://www.npmjs.com/): Node.js package manager
-It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [.vscode](./.vscode) folder.
-# Integrating with smart contracts and application clients
+Pera Wallet / WalletConnect for authentication
 
-Refer to the detailed guidance on [integrating with smart contracts and application clients](./src/contracts/README.md). In essence, for any smart contract codebase generated with AlgoKit or other tools that produce compile contracts into ARC34 compliant app specifications, you can use the `algokit generate` command to generate TypeScript or Python typed client. Once generated simply drag and drop the generated client into `./src/contracts` and import it into your React components as you see fit.
+⚙️ AlgoKit Setup (Blockchain Dev)
+
+Ensure you have:
+✅ Python 3.10+
+✅ Docker installed
+✅ AlgoKit installed:
+
+pipx install algokit
+
+
+Initialize Blockchain Workspace:
+
+algokit init
+
+
+Start Local Algorand Network (sandbox):
+
+algokit localnet start
+
+
+Deploy Smart Contracts / ASA:
+
+algokit project deploy
+
+
+Fund accounts & test wallet integration using:
+
+algokit generate account
+
+▶️ Run the Frontend Locally
+
+Clone the repository:
+
+git clone https://github.com/devndesigner6/Kortex-Flow.git
+cd Kortex-Flow
+
+
+Install dependencies:
+
+npm install
+
+
+Create .env with Gmail/Calendar API Keys:
+
+VITE_GOOGLE_CLIENT_ID=your_client_id
+VITE_GOOGLE_API_KEY=your_api_key
+
+
+Run the app:
+
+npm run dev
+
+
+Open in browser:
+
+http://localhost:5173
+
+🔐 Security & Privacy
+
+OAuth for Google data permissions
+
+Local blockchain ledger for accountability
+
+No data stored without explicit user consent
+
+Your inbox. Your tasks. Your control.
+
+🛰️ Project Roadmap
+Phase	Focus	Status
+Phase 1	Smart inbox → Task extraction	✅ Complete
+Phase 2	Calendar sync + notifications	✅ Complete
+Phase 3	Blockchain reward system	🚧 In Progress
+Phase 4	Cross-platform experience	🔜 Coming Soon
