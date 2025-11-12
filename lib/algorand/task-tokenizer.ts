@@ -92,7 +92,7 @@ export async function tokenizeTask(taskData: TaskData): Promise<TokenizedTask> {
 
   // 7. Transaction 1: Create ASA (1-unit task token)
   const asaCreateTxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
-    from: creatorAddr,
+    sender: creatorAddr,
     total: 1, // Only 1 token per task
     decimals: 0, // Non-divisible
     defaultFrozen: false,
@@ -114,7 +114,7 @@ export async function tokenizeTask(taskData: TaskData): Promise<TokenizedTask> {
   }
 
   const appCallTxn = algosdk.makeApplicationNoOpTxnFromObject({
-    from: creatorAddr,
+    sender: creatorAddr,
     suggestedParams,
     appIndex: appId,
     appArgs: [
@@ -156,8 +156,8 @@ export async function createAssetTransfer(
   const suggestedParams = await algodClient.getTransactionParams().do();
 
   return algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-    from,
-    to,
+    sender: from,
+    receiver: to,
     assetIndex: assetId,
     amount,
     suggestedParams,
@@ -176,8 +176,8 @@ export async function createAssetOptIn(
   const suggestedParams = await algodClient.getTransactionParams().do();
 
   return algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-    from: address,
-    to: address, // Self-transfer for opt-in
+    sender: address,
+    receiver: address, // Self-transfer for opt-in
     assetIndex: assetId,
     amount: 0,
     suggestedParams,
