@@ -42,6 +42,7 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
   return (
     <div className="mb-6 flex flex-col gap-3 border-b border-primary/20 pb-4 sm:mb-8 sm:gap-4 sm:pb-6 md:flex-row md:items-center md:justify-between">
       <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+        <KortexFlowLogo size={50} className="block shrink-0 sm:hidden" />
         <KortexFlowLogo size={60} className="hidden shrink-0 sm:block" />
         <div className="min-w-0 flex-1">
           <h1 className="font-serif text-xl italic leading-tight tracking-wide text-primary sm:text-2xl md:text-3xl lg:text-4xl">

@@ -57,23 +57,25 @@ export function RecentEmails({ emails }: RecentEmailsProps) {
                 onClick={() => handleEmailClick(email)}
                 className="group cursor-pointer rounded-lg border border-primary/20 bg-primary/5 p-4 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-md active:scale-[0.99]"
               >
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="flex items-center gap-2 flex-1">
-                    <h3 className="font-serif text-base font-medium text-foreground">
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <h3 className="min-w-0 flex-1 truncate font-serif text-base font-medium text-foreground">
                       {email.subject || "No Subject"}
                     </h3>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                    <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                   </div>
                   {!email.processed && (
-                    <Badge className="border-blue-500/30 bg-blue-500/20 font-mono text-xs text-blue-500">NEW</Badge>
+                    <Badge className="shrink-0 border-blue-500/30 bg-blue-500/20 font-mono text-xs text-blue-500">
+                      NEW
+                    </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <User className="h-3 w-3" />
-                  <span className="font-mono">{email.sender || "Unknown"}</span>
+                <div className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                  <User className="h-3 w-3 shrink-0" />
+                  <span className="min-w-0 truncate font-mono">{email.sender || "Unknown"}</span>
                 </div>
                 <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="h-3 w-3 shrink-0" />
                   <span className="font-mono">{formatTime(email.received_at)}</span>
                 </div>
               </div>

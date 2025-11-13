@@ -10,7 +10,8 @@ export default function HomePage() {
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-4xl text-center">
           <div className="mb-6 flex justify-center sm:mb-8">
-            <KortexFlowLogo size={150} className="animate-fade-in" />
+            <KortexFlowLogo size={120} className="animate-fade-in sm:hidden" />
+            <KortexFlowLogo size={150} className="hidden animate-fade-in sm:block" />
           </div>
 
           <h1 className="mb-4 font-serif text-4xl tracking-wide text-primary sm:mb-6 sm:text-6xl md:text-8xl">
