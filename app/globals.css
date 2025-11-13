@@ -3,44 +3,44 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Enhanced light mode with beautiful green shades for aesthetic look */
+/* Updated light mode with cleaner, more professional color scheme */
 :root {
-  /* Soft cream/off-white backgrounds */
-  --background: oklch(0.98 0.01 130);
-  --foreground: oklch(0.25 0.05 145);
+  /* Clean white/light gray backgrounds */
+  --background: oklch(0.99 0.002 240);
+  --foreground: oklch(0.2 0.015 240);
 
-  /* Subtle green-tinted cards */
-  --card: oklch(0.97 0.015 125);
-  --card-foreground: oklch(0.28 0.06 145);
+  /* Subtle gray cards with slight warmth */
+  --card: oklch(0.98 0.005 240);
+  --card-foreground: oklch(0.22 0.015 240);
 
-  --popover: oklch(0.99 0.01 125);
-  --popover-foreground: oklch(0.25 0.05 145);
+  --popover: oklch(0.99 0.002 240);
+  --popover-foreground: oklch(0.2 0.015 240);
 
-  /* Elegant forest green primary */
-  --primary: oklch(0.45 0.12 150);
-  --primary-foreground: oklch(0.98 0.01 130);
+  /* Professional teal/cyan primary for tech aesthetic */
+  --primary: oklch(0.5 0.14 190);
+  --primary-foreground: oklch(0.99 0.002 240);
 
-  /* Soft sage secondary */
-  --secondary: oklch(0.88 0.03 135);
-  --secondary-foreground: oklch(0.3 0.08 148);
+  /* Soft gray-blue secondary */
+  --secondary: oklch(0.94 0.015 240);
+  --secondary-foreground: oklch(0.28 0.02 240);
 
-  /* Muted moss tones */
-  --muted: oklch(0.91 0.025 132);
-  --muted-foreground: oklch(0.48 0.06 142);
+  /* Muted cool gray tones */
+  --muted: oklch(0.95 0.01 240);
+  --muted-foreground: oklch(0.5 0.02 240);
 
-  /* Subtle mint accent */
-  --accent: oklch(0.89 0.04 140);
-  --accent-foreground: oklch(0.28 0.08 148);
+  /* Subtle blue-tinted accent */
+  --accent: oklch(0.96 0.02 220);
+  --accent-foreground: oklch(0.28 0.025 220);
 
   --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0.01 130);
+  --destructive-foreground: oklch(0.99 0.002 240);
 
-  /* Soft olive borders */
-  --border: oklch(0.84 0.04 135);
-  --input: oklch(0.86 0.03 138);
+  /* Light gray borders */
+  --border: oklch(0.9 0.01 240);
+  --input: oklch(0.92 0.01 240);
 
-  /* Medium green ring */
-  --ring: oklch(0.52 0.11 145);
+  /* Teal ring for focus states */
+  --ring: oklch(0.55 0.12 190);
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -49,15 +49,15 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
 
-  /* Sidebar with soft green tint */
-  --sidebar: oklch(0.96 0.015 128);
-  --sidebar-foreground: oklch(0.3 0.06 145);
-  --sidebar-primary: oklch(0.42 0.11 148);
-  --sidebar-primary-foreground: oklch(0.97 0.01 125);
-  --sidebar-accent: oklch(0.93 0.02 132);
-  --sidebar-accent-foreground: oklch(0.32 0.07 146);
-  --sidebar-border: oklch(0.88 0.03 135);
-  --sidebar-ring: oklch(0.65 0.08 142);
+  /* Sidebar with clean light aesthetic */
+  --sidebar: oklch(0.98 0.005 240);
+  --sidebar-foreground: oklch(0.25 0.02 240);
+  --sidebar-primary: oklch(0.48 0.13 190);
+  --sidebar-primary-foreground: oklch(0.98 0.005 240);
+  --sidebar-accent: oklch(0.96 0.01 240);
+  --sidebar-accent-foreground: oklch(0.3 0.025 240);
+  --sidebar-border: oklch(0.92 0.01 240);
+  --sidebar-ring: oklch(0.6 0.1 190);
 }
 
 /* Enhanced dark mode with terminal aesthetic */
