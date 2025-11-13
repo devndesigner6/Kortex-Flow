@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { getPeraWallet, getDeflyWallet, disconnectAllWallets } from "@/lib/algorand/wallet-client"
 import algosdk from "algosdk"
 import { getNetworkConfig, type AlgorandNetwork } from "@/lib/algorand/config"
@@ -17,16 +17,24 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   const [isConnecting, setIsConnecting] = useState(false)
   const [isSending, setIsSending] = useState(false)
 
-  const networkConfig = getNetworkConfig(network)
-  const algodClient = new algosdk.Algodv2(networkConfig.nodeToken, networkConfig.nodeServer, networkConfig.nodePort)
+  const networkConfig = useMemo(() => getNetworkConfig(network), [network])
+  const algodClient = useMemo(
+    () => new algosdk.Algodv2(networkConfig.nodeToken, networkConfig.nodeServer, networkConfig.nodePort),
+    [networkConfig],
+  )
 
   const fetchBalance = async (addr: string) => {
     try {
-      console.log("[v0] Fetching balance for:", addr, "on network:", network)
+      console.log("[v0] Fetching balance for address:", addr)
+      console.log("[v0] Using network:", network)
+      console.log("[v0] API endpoint:", networkConfig.nodeServer)
+
       const accountInfo = await algodClient.accountInformation(addr).do()
-      console.log("[v0] Account info:", accountInfo)
+      console.log("[v0] Raw account info:", accountInfo)
+
       const algoBalance = accountInfo.amount / 1_000_000 // Convert microAlgos to Algos
-      console.log("[v0] Balance fetched:", algoBalance, "ALGO")
+      console.log("[v0] Balance calculated:", algoBalance, "ALGO")
+
       setBalance(algoBalance)
     } catch (error) {
       console.error("[v0] Error fetching balance:", error)
@@ -36,10 +44,10 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
   useEffect(() => {
     if (walletAddress) {
-      console.log("[v0] Network changed, refetching balance")
+      console.log("[v0] Network or wallet changed, refetching balance")
       fetchBalance(walletAddress)
     }
-  }, [network, walletAddress])
+  }, [network, walletAddress, algodClient])
 
   useEffect(() => {
     const restoreConnection = async () => {
@@ -90,6 +98,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       })
 
       if (accounts.length > 0) {
+        console.log("[v0] Pera wallet connected:", accounts[0])
         localStorage.setItem(WALLET_TYPE_KEY, "pera")
         localStorage.setItem(WALLET_ADDRESS_KEY, accounts[0])
 
@@ -119,6 +128,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       })
 
       if (accounts.length > 0) {
+        console.log("[v0] Defly wallet connected:", accounts[0])
         localStorage.setItem(WALLET_TYPE_KEY, "defly")
         localStorage.setItem(WALLET_ADDRESS_KEY, accounts[0])
 
@@ -145,6 +155,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
   const refreshBalance = async () => {
     if (walletAddress) {
+      console.log("[v0] Manually refreshing balance")
       await fetchBalance(walletAddress)
     }
   }
