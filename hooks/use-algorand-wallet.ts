@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { getPeraWallet, getDeflyWallet, disconnectAllWallets } from "@/lib/algorand/wallet-client"
 import algosdk from "algosdk"
 import { getNetworkConfig, type AlgorandNetwork } from "@/lib/algorand/config"
@@ -23,31 +23,34 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
     [networkConfig],
   )
 
-  const fetchBalance = async (addr: string) => {
-    try {
-      console.log("[v0] Fetching balance for address:", addr)
-      console.log("[v0] Using network:", network)
-      console.log("[v0] API endpoint:", networkConfig.nodeServer)
+  const fetchBalance = useCallback(
+    async (addr: string) => {
+      try {
+        console.log("[v0] Fetching balance for address:", addr)
+        console.log("[v0] Using network:", network)
+        console.log("[v0] API endpoint:", networkConfig.nodeServer)
 
-      const accountInfo = await algodClient.accountInformation(addr).do()
-      console.log("[v0] Raw account info:", accountInfo)
+        const accountInfo = await algodClient.accountInformation(addr).do()
+        console.log("[v0] Raw account info:", accountInfo)
 
-      const algoBalance = accountInfo.amount / 1_000_000 // Convert microAlgos to Algos
-      console.log("[v0] Balance calculated:", algoBalance, "ALGO")
+        const algoBalance = accountInfo.amount / 1_000_000 // Convert microAlgos to Algos
+        console.log("[v0] Balance calculated:", algoBalance, "ALGO")
 
-      setBalance(algoBalance)
-    } catch (error) {
-      console.error("[v0] Error fetching balance:", error)
-      setBalance(0)
-    }
-  }
+        setBalance(algoBalance)
+      } catch (error) {
+        console.error("[v0] Error fetching balance:", error)
+        setBalance(0)
+      }
+    },
+    [network, networkConfig.nodeServer, algodClient],
+  )
 
   useEffect(() => {
     if (walletAddress) {
       console.log("[v0] Network or wallet changed, refetching balance")
       fetchBalance(walletAddress)
     }
-  }, [network, walletAddress, algodClient])
+  }, [walletAddress, fetchBalance])
 
   useEffect(() => {
     const restoreConnection = async () => {
@@ -58,7 +61,6 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         console.log("[v0] Restoring wallet connection:", savedWalletType, savedAddress)
         setWalletType(savedWalletType)
         setWalletAddress(savedAddress)
-        await fetchBalance(savedAddress)
 
         // Reconnect to the wallet SDK
         try {
@@ -90,6 +92,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       const accounts = await peraWallet.connect()
 
       peraWallet.connector?.on("disconnect", () => {
+        console.log("[v0] Pera wallet disconnected")
         localStorage.removeItem(WALLET_TYPE_KEY)
         localStorage.removeItem(WALLET_ADDRESS_KEY)
         setWalletAddress(null)
@@ -104,7 +107,6 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
         setWalletAddress(accounts[0])
         setWalletType("pera")
-        await fetchBalance(accounts[0])
       }
     } catch (error) {
       console.error("[v0] Error connecting to Pera:", error)
@@ -120,6 +122,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       const accounts = await deflyWallet.connect()
 
       deflyWallet.connector?.on("disconnect", () => {
+        console.log("[v0] Defly wallet disconnected")
         localStorage.removeItem(WALLET_TYPE_KEY)
         localStorage.removeItem(WALLET_ADDRESS_KEY)
         setWalletAddress(null)
@@ -134,7 +137,6 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
         setWalletAddress(accounts[0])
         setWalletType("defly")
-        await fetchBalance(accounts[0])
       }
     } catch (error) {
       console.error("[v0] Error connecting to Defly:", error)
@@ -144,6 +146,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   }
 
   const disconnect = async () => {
+    console.log("[v0] Disconnecting wallet")
     localStorage.removeItem(WALLET_TYPE_KEY)
     localStorage.removeItem(WALLET_ADDRESS_KEY)
 
@@ -161,10 +164,14 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   }
 
   const sendPayment = async (recipient: string, amount: number) => {
-    if (!walletAddress || !walletType) return
+    if (!walletAddress || !walletType) {
+      console.error("[v0] No wallet connected")
+      throw new Error("No wallet connected")
+    }
 
     setIsSending(true)
     try {
+      console.log("[v0] Sending payment:", { recipient, amount })
       const params = await algodClient.getTransactionParams().do()
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: walletAddress,
@@ -184,8 +191,12 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         signedTxn = await deflyWallet.signTransaction([txnArray])
       }
 
+      console.log("[v0] Transaction signed, sending...")
       const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
+      console.log("[v0] Transaction sent, ID:", txId)
+
       await algosdk.waitForConfirmation(algodClient, txId, 4)
+      console.log("[v0] Transaction confirmed")
 
       await refreshBalance()
       return txId
