@@ -96,10 +96,10 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* Only define fonts in @theme inline - no var() references allowed in Tailwind v4 */
 @theme inline {
-  --font-serif: "Instrument Serif", serif;
-  --font-mono: "Geist Mono", monospace;
-  --font-playfair: "Playfair Display", serif;
+  --font-serif: "Instrument Serif", "Instrument Serif Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -143,22 +143,18 @@
     @apply border-border outline-ring/50;
   }
   body {
-    /* Reduced transition duration from 300ms to 150ms for faster feel */
     @apply bg-background text-foreground transition-colors duration-150;
   }
 }
 
 @layer utilities {
   .page-transition {
-    /* Reduced animation time from 0.6s to 0.25s for snappier page transitions */
     animation: fadeSlideIn 0.25s ease-out;
   }
 
-  /* Added smooth slide animation between pages */
   @keyframes fadeSlideIn {
     from {
       opacity: 0;
-      /* Reduced translateX from -30px to -15px for subtler, faster animation */
       transform: translateX(-15px);
     }
     to {
@@ -170,7 +166,6 @@
   @keyframes slideIn {
     from {
       opacity: 0;
-      /* Reduced translateX from -20px to -10px */
       transform: translateX(-10px);
     }
     to {
@@ -179,7 +174,21 @@
     }
   }
 
-  /* Added shimmer animation for premium button effect */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+
   @keyframes shimmer {
     0% {
       transform: translateX(-100%);
@@ -190,11 +199,9 @@
   }
 
   .animate-shimmer {
-    /* Reduced shimmer duration from 2s to 1.5s */
     animation: shimmer 1.5s ease-in-out;
   }
 
-  /* Enhanced glow with more vibrant colors */
   @keyframes glow {
     0%,
     100% {
@@ -206,19 +213,15 @@
   }
 
   .animate-slide-in {
-    /* Reduced slide-in duration from 0.6s to 0.25s */
     animation: slideIn 0.25s ease-out;
   }
 
   .animate-glow {
-    /* Reduced glow animation duration from 2s to 1.5s */
     animation: glow 1.5s ease-in-out infinite;
   }
 
-  /* Improved button hover effects */
   .glow-button {
     position: relative;
-    /* Reduced transition duration from 0.5s to 0.2s for instant feedback */
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -231,7 +234,6 @@
     transform: translateY(-1px) scale(1.01);
   }
 
-  /* Added slow spin animation for orb border */
   @keyframes spin-slow {
     from {
       transform: rotate(0deg);
@@ -274,7 +276,6 @@
     z-index: -1;
   }
 
-  /* Added gradient radial utility */
   .bg-gradient-radial {
     background-image: radial-gradient(circle, var(--tw-gradient-stops));
   }

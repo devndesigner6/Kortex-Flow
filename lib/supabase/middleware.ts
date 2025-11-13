@@ -6,18 +6,9 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  // Skip Supabase checks if credentials aren't configured
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('your_supabase')) {
-    console.log('[Middleware] Supabase not configured, skipping auth checks')
-    return supabaseResponse
-  }
-
   const supabase = createServerClient(
-    supabaseUrl,
-    supabaseKey,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -38,15 +29,19 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const publicPaths = ["/", "/about"]
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
+  const isAuthPath = request.nextUrl.pathname.startsWith("/auth")
+
   // Redirect to login if not authenticated and trying to access protected routes
-  if (!user && !request.nextUrl.pathname.startsWith("/auth") && request.nextUrl.pathname !== "/") {
+  if (!user && !isAuthPath && !isPublicPath) {
     const url = request.nextUrl.clone()
     url.pathname = "/auth/login"
     return NextResponse.redirect(url)
   }
 
-  // Redirect to dashboard if authenticated and trying to access auth pages
-  if (user && (request.nextUrl.pathname.startsWith("/auth") || request.nextUrl.pathname === "/")) {
+  // Redirect to dashboard if authenticated and trying to access auth pages or home
+  if (user && (isAuthPath || request.nextUrl.pathname === "/")) {
     const url = request.nextUrl.clone()
     url.pathname = "/dashboard"
     return NextResponse.redirect(url)

@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist_Mono, Instrument_Serif, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { AlgorandWalletProvider } from "@/lib/algorand/wallet-context"
 import "./globals.css"
 
 const instrumentSerif = Instrument_Serif({
@@ -25,6 +24,9 @@ export const metadata: Metadata = {
   title: "KortexFlow - AI Personal Assistant",
   description: "Automatically extract tasks and meetings from Gmail and Calendar",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.png",
+  },
 }
 
 export default function RootLayout({
@@ -39,10 +41,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-mono antialiased">
-        <AlgorandWalletProvider>
-          {children}
-          <Analytics />
-        </AlgorandWalletProvider>
+        {children}
+        <Analytics />
       </body>
     </html>
   )
