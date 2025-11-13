@@ -3,34 +3,43 @@
 import { useState, useEffect } from "react"
 import { getPeraWallet, getDeflyWallet, disconnectAllWallets } from "@/lib/algorand/wallet-client"
 import algosdk from "algosdk"
-import { ALGORAND_CONFIG } from "@/lib/algorand/config"
+import { getNetworkConfig, type AlgorandNetwork } from "@/lib/algorand/config"
 
 type WalletType = "pera" | "defly" | null
 
 const WALLET_TYPE_KEY = "kortexflow_wallet_type"
 const WALLET_ADDRESS_KEY = "kortexflow_wallet_address"
 
-export function useAlgorandWallet() {
+export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   const [walletType, setWalletType] = useState<WalletType>(null)
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [balance, setBalance] = useState<number>(0)
   const [isConnecting, setIsConnecting] = useState(false)
   const [isSending, setIsSending] = useState(false)
 
-  const algodClient = new algosdk.Algodv2(
-    ALGORAND_CONFIG.nodeToken,
-    ALGORAND_CONFIG.nodeServer,
-    ALGORAND_CONFIG.nodePort,
-  )
+  const networkConfig = getNetworkConfig(network)
+  const algodClient = new algosdk.Algodv2(networkConfig.nodeToken, networkConfig.nodeServer, networkConfig.nodePort)
 
   const fetchBalance = async (addr: string) => {
     try {
+      console.log("[v0] Fetching balance for:", addr, "on network:", network)
       const accountInfo = await algodClient.accountInformation(addr).do()
-      setBalance(accountInfo.amount / 1_000_000) // Convert microAlgos to Algos
+      console.log("[v0] Account info:", accountInfo)
+      const algoBalance = accountInfo.amount / 1_000_000 // Convert microAlgos to Algos
+      console.log("[v0] Balance fetched:", algoBalance, "ALGO")
+      setBalance(algoBalance)
     } catch (error) {
       console.error("[v0] Error fetching balance:", error)
+      setBalance(0)
     }
   }
+
+  useEffect(() => {
+    if (walletAddress) {
+      console.log("[v0] Network changed, refetching balance")
+      fetchBalance(walletAddress)
+    }
+  }, [network, walletAddress])
 
   useEffect(() => {
     const restoreConnection = async () => {
@@ -64,7 +73,6 @@ export function useAlgorandWallet() {
     }
 
     restoreConnection()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const connectPera = async () => {
