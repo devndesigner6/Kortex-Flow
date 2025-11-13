@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state") // user_id
   const error = searchParams.get("error")
 
-  const origin = request.nextUrl.origin
-  const redirectUri = `${origin}/api/gmail/callback`
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
+  const redirectUri = `${appUrl}/api/gmail/callback`
 
   console.log("[v0] Callback params:", {
     hasCode: !!code,
     state,
     error,
-    origin,
+    appUrl,
     redirectUri,
     allParams: Object.fromEntries(searchParams.entries()),
   })
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID!,
         client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: redirectUri, // Use dynamic redirect URI
+        redirect_uri: redirectUri,
         grant_type: "authorization_code",
       }),
     })

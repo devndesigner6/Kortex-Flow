@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const origin = request.nextUrl.origin
-  const redirectUri = `${origin}/api/calendar/callback`
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
+  const redirectUri = `${appUrl}/api/calendar/callback`
 
-  console.log("[v0] Calendar OAuth - Origin:", origin)
+  console.log("[v0] Calendar OAuth - App URL:", appUrl)
   console.log("[v0] Calendar OAuth - Redirect URI:", redirectUri)
 
   // Build OAuth URL for Google Calendar

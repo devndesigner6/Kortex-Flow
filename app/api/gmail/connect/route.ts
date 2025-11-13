@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const origin = request.nextUrl.origin
-  const redirectUri = `${origin}/api/gmail/callback`
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
+  const redirectUri = `${appUrl}/api/gmail/callback`
 
-  console.log("[v0] Gmail OAuth - Origin:", origin)
+  console.log("[v0] Gmail OAuth - App URL:", appUrl)
   console.log("[v0] Gmail OAuth - Redirect URI:", redirectUri)
 
   // Build OAuth URL for Gmail
