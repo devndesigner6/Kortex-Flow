@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Wallet, AlertCircle, CheckCircle2, Loader2, ExternalLink } from "lucide-react"
+import { X, Wallet, AlertCircle, CheckCircle2, Loader2, ExternalLink } from 'lucide-react'
 import { usePayment } from "@/hooks/use-payment"
 import { getNetworkConfig } from "@/lib/algorand/config"
 
@@ -25,14 +25,11 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
 
   useEffect(() => {
     if (isOpen) {
-      loadBalance()
+      const bal = checkBalance()
+      console.log("[v0 PAYMENT MODAL] Setting balance to:", bal)
+      setBalance(bal)
     }
-  }, [isOpen])
-
-  const loadBalance = async () => {
-    const bal = await checkBalance()
-    setBalance(bal)
-  }
+  }, [isOpen, checkBalance])
 
   const handlePayment = async () => {
     if (balance < amount) {

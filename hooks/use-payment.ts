@@ -6,7 +6,7 @@ import { useAlgorandWallet } from "./use-algorand-wallet"
 import type { AlgorandNetwork } from "@/lib/algorand/config"
 
 export function usePayment() {
-  const { walletAddress, walletType } = useAlgorandWallet()
+  const { walletAddress, walletType, balance } = useAlgorandWallet()
   const [isProcessing, setIsProcessing] = useState(false)
   const [network, setNetwork] = useState<AlgorandNetwork>("testnet")
 
@@ -38,16 +38,15 @@ export function usePayment() {
     }
   }
 
-  const checkBalance = async (): Promise<number> => {
-    if (!walletAddress) return 0
-
-    const handler = new AlgorandPaymentHandler(network)
-    return handler.getBalance(walletAddress)
+  const getBalance = (): number => {
+    console.log("[v0 PAYMENT] Getting balance from wallet hook:", balance)
+    // Convert from ALGO to microAlgos for compatibility
+    return balance * 1_000_000
   }
 
   return {
     processPayment,
-    checkBalance,
+    checkBalance: getBalance,
     isProcessing,
     network,
     setNetwork,
