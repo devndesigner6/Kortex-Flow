@@ -189,8 +189,8 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       const params = await algodClient.getTransactionParams().do()
       
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: algosdk.encodeAddress(Buffer.from(walletAddress, "base32")),
-        to: algosdk.encodeAddress(Buffer.from(recipient, "base32")),
+        from: walletAddress,
+        to: recipient,
         amount: Math.floor(amount * 1_000_000), // Convert ALGO to microAlgos
         suggestedParams: params,
       })
