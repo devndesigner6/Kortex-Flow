@@ -30,11 +30,18 @@ export async function GET(request: NextRequest) {
     const microAlgos = Number(accountInfo.amount)
     const balance = microAlgos / 1_000_000
     
-    console.log("[v0 API] Micro ALGOs:", microAlgos)
-    console.log("[v0 API] Calculated balance:", balance, "ALGO")
+    console.log("[v0 API] Raw amount:", accountInfo.amount)
+    console.log("[v0 API] Micro ALGOs (number):", microAlgos)
+    console.log("[v0 API] Balance in ALGO:", balance)
     console.log("[v0 API] ===== BALANCE REQUEST COMPLETE =====")
 
-    return NextResponse.json({ balance, address, network })
+    // Return balance in ALGO (not microAlgos)
+    return NextResponse.json({ 
+      balance, 
+      microAlgos, 
+      address, 
+      network 
+    })
   } catch (error) {
     console.error("[v0 API] ===== ERROR =====")
     console.error("[v0 API] Error type:", error instanceof Error ? error.constructor.name : typeof error)

@@ -108,17 +108,30 @@ export class AlgorandPaymentHandler {
 
   async getBalance(address: string): Promise<number> {
     try {
+      console.log("[v0 HANDLER] Fetching balance for address:", address, "network:", this.network)
+      
       const response = await fetch(`/api/algorand/balance?address=${address}&network=${this.network}`)
       
       if (!response.ok) {
-        console.error("[v0] Failed to fetch balance from API:", response.status)
+        console.error("[v0 HANDLER] API returned error status:", response.status)
+        const errorData = await response.json()
+        console.error("[v0 HANDLER] Error details:", errorData)
         return 0
       }
 
       const data = await response.json()
-      return data.balance || 0
+      console.log("[v0 HANDLER] API response:", data)
+      
+      // API returns balance in ALGO, convert to microAlgos
+      const balanceInAlgo = data.balance || 0
+      const balanceInMicroAlgos = Math.floor(balanceInAlgo * 1_000_000)
+      
+      console.log("[v0 HANDLER] Balance in ALGO:", balanceInAlgo)
+      console.log("[v0 HANDLER] Balance in microAlgos:", balanceInMicroAlgos)
+      
+      return balanceInMicroAlgos
     } catch (error) {
-      console.error("[v0] Failed to fetch balance:", error)
+      console.error("[v0 HANDLER] Failed to fetch balance:", error)
       return 0
     }
   }
