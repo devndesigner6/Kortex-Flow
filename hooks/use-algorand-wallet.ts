@@ -187,9 +187,10 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       console.log("[v0 WALLET] Starting payment transaction:", { recipient, amount, from: walletAddress })
       
       const params = await algodClient.getTransactionParams().do()
+      
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: walletAddress,
-        to: recipient,
+        from: algosdk.encodeAddress(Buffer.from(walletAddress, "base32")),
+        to: algosdk.encodeAddress(Buffer.from(recipient, "base32")),
         amount: Math.floor(amount * 1_000_000), // Convert ALGO to microAlgos
         suggestedParams: params,
       })
@@ -199,16 +200,14 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
         console.log("[v0 WALLET] Signing with Pera wallet")
-        // Pera wallet expects the transaction as bytes
-        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        const signedTxns = await peraWallet.signTransaction([txnGroup])
+        const txnsToSign = [{ txn: transaction }]
+        const signedTxns = await peraWallet.signTransaction(txnsToSign)
         signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 WALLET] Signing with Defly wallet")
-        // Defly wallet expects the transaction as bytes
-        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        const signedTxns = await deflyWallet.signTransaction([txnGroup])
+        const txnsToSign = [{ txn: transaction }]
+        const signedTxns = await deflyWallet.signTransaction(txnsToSign)
         signedTxn = signedTxns[0]
       }
 
