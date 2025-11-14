@@ -184,52 +184,71 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
     setIsSending(true)
     try {
-      console.log("[v0 WALLET] Starting payment transaction:", { recipient, amount, from: walletAddress })
+      console.log("[v0 WALLET] ===== STARTING PAYMENT =====")
+      console.log("[v0 WALLET] From:", walletAddress)
+      console.log("[v0 WALLET] To:", recipient)
+      console.log("[v0 WALLET] Amount (ALGO):", amount)
+      console.log("[v0 WALLET] Wallet type:", walletType)
       
       const params = await algodClient.getTransactionParams().do()
+      console.log("[v0 WALLET] Got transaction params")
+      
+      const amountInMicroAlgos = Math.floor(amount * 1_000_000)
+      console.log("[v0 WALLET] Amount in microAlgos:", amountInMicroAlgos)
       
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: walletAddress,
         to: recipient,
-        amount: Math.floor(amount * 1_000_000), // Convert ALGO to microAlgos
+        amount: amountInMicroAlgos,
         suggestedParams: params,
       })
 
-      console.log("[v0 WALLET] Transaction created:", {
-        from: walletAddress,
-        to: recipient,
-        amount: Math.floor(amount * 1_000_000),
+      console.log("[v0 WALLET] Transaction created successfully")
+      console.log("[v0 WALLET] Transaction details:", {
+        from: transaction.from.toString(),
+        to: transaction.to.toString(),
+        amount: transaction.amount,
       })
+
+      const txnsToSign = [{ txn: transaction }]
+      console.log("[v0 WALLET] Transaction prepared for signing")
 
       let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        console.log("[v0 WALLET] Signing with Pera wallet")
-        const signedTxns = await peraWallet.signTransaction([{ txn: transaction }])
+        console.log("[v0 WALLET] Requesting Pera wallet signature...")
+        const signedTxns = await peraWallet.signTransaction([txnsToSign])
+        console.log("[v0 WALLET] Pera signature response received, length:", signedTxns.length)
         signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Pera signature complete")
+        console.log("[v0 WALLET] Extracted signed transaction")
       } else {
         const deflyWallet = getDeflyWallet()
-        console.log("[v0 WALLET] Signing with Defly wallet")
-        const signedTxns = await deflyWallet.signTransaction([{ txn: transaction }])
+        console.log("[v0 WALLET] Requesting Defly wallet signature...")
+        const signedTxns = await deflyWallet.signTransaction([txnsToSign])
+        console.log("[v0 WALLET] Defly signature response received, length:", signedTxns.length)
         signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Defly signature complete")
+        console.log("[v0 WALLET] Extracted signed transaction")
       }
 
-      console.log("[v0 WALLET] Transaction signed successfully, sending to network...")
+      console.log("[v0 WALLET] Sending signed transaction to network...")
       const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
-      console.log("[v0 WALLET] Transaction sent, ID:", txId)
+      console.log("[v0 WALLET] Transaction sent! ID:", txId)
 
       console.log("[v0 WALLET] Waiting for confirmation...")
       await algosdk.waitForConfirmation(algodClient, txId, 4)
       console.log("[v0 WALLET] Transaction confirmed!")
+      console.log("[v0 WALLET] ===== PAYMENT COMPLETE =====")
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0 WALLET] Error sending payment:", error)
-      console.error("[v0 WALLET] Error details:", error instanceof Error ? error.message : String(error))
+      console.error("[v0 WALLET] ===== PAYMENT FAILED =====")
+      console.error("[v0 WALLET] Error:", error)
+      if (error instanceof Error) {
+        console.error("[v0 WALLET] Error message:", error.message)
+        console.error("[v0 WALLET] Error stack:", error.stack)
+      }
       throw error
     } finally {
       setIsSending(false)

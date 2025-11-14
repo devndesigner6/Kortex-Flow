@@ -7,9 +7,9 @@ import type { AlgorandNetwork } from "@/lib/algorand/config"
 import { TREASURY_WALLET } from "@/lib/algorand/config"
 
 export function usePayment() {
-  const { walletAddress, walletType, balance, sendPayment: walletSendPayment } = useAlgorandWallet()
-  const [isProcessing, setIsProcessing] = useState(false)
   const [network, setNetwork] = useState<AlgorandNetwork>("testnet")
+  const { walletAddress, walletType, balance, sendPayment: walletSendPayment } = useAlgorandWallet(network)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const processPayment = async (amount: number, note?: string): Promise<PaymentResult> => {
     console.log("[v0 PAYMENT] Processing payment with:", { walletAddress, walletType, amount })
@@ -33,13 +33,11 @@ export function usePayment() {
     setIsProcessing(true)
 
     try {
-      // Use the treasury wallet address for the current network
       const treasuryAddress = TREASURY_WALLET[network]
       
       console.log("[v0 PAYMENT] Sending to treasury:", treasuryAddress)
       console.log("[v0 PAYMENT] Amount in ALGO:", amount / 1_000_000)
       
-      // walletSendPayment expects amount in ALGO, so convert from microAlgos
       const txId = await walletSendPayment(treasuryAddress, amount / 1_000_000)
       
       console.log("[v0 PAYMENT] Payment successful, txId:", txId)
@@ -61,7 +59,6 @@ export function usePayment() {
 
   const getBalance = (): number => {
     console.log("[v0 PAYMENT] Getting balance from wallet hook:", balance)
-    // Convert from ALGO to microAlgos for compatibility
     return balance * 1_000_000
   }
 
