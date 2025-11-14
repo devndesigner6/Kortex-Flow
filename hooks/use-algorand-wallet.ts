@@ -184,14 +184,12 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
     setIsSending(true)
     try {
-      console.log("[v0 WALLET] ===== STARTING PAYMENT =====")
+      console.log("[v0 WALLET] Starting payment transaction")
       console.log("[v0 WALLET] From:", walletAddress)
       console.log("[v0 WALLET] To:", recipient)
       console.log("[v0 WALLET] Amount (ALGO):", amount)
-      console.log("[v0 WALLET] Wallet type:", walletType)
       
       const params = await algodClient.getTransactionParams().do()
-      console.log("[v0 WALLET] Got transaction params")
       
       const amountInMicroAlgos = Math.floor(amount * 1_000_000)
       console.log("[v0 WALLET] Amount in microAlgos:", amountInMicroAlgos)
@@ -203,61 +201,47 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
-      console.log("[v0 WALLET] Transaction created successfully")
-      console.log("[v0 WALLET] Transaction details:", {
-        from: transaction.from.toString(),
-        to: transaction.to.toString(),
-        amount: transaction.amount,
-      })
-
-      const singleTxnArray = [{ txn: transaction }]
-      console.log("[v0 WALLET] Single txn array:", singleTxnArray)
+      console.log("[v0 WALLET] Transaction created")
 
       let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        console.log("[v0 WALLET] Requesting Pera wallet signature...")
-        console.log("[v0 WALLET] Passing to signTransaction:", singleTxnArray)
+        console.log("[v0 WALLET] Requesting Pera signature")
         
-        const signedTxns = await peraWallet.signTransaction([singleTxnArray])
+        // Pera expects: SignerTransaction[][] (array of transaction groups)
+        const txnGroup = [{ txn: transaction }]
+        const signedTxns = await peraWallet.signTransaction([txnGroup])
         
-        console.log("[v0 WALLET] Pera signature response type:", typeof signedTxns)
-        console.log("[v0 WALLET] Pera signature response:", signedTxns)
-        console.log("[v0 WALLET] Is array?:", Array.isArray(signedTxns))
-        if (Array.isArray(signedTxns)) {
-          console.log("[v0 WALLET] Array length:", signedTxns.length)
-          console.log("[v0 WALLET] First element type:", typeof signedTxns[0])
-          console.log("[v0 WALLET] First element:", signedTxns[0])
-        }
-        signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Extracted signed transaction")
+        console.log("[v0 WALLET] Pera response:", signedTxns)
+        
+        signedTxn = Array.isArray(signedTxns[0]) ? signedTxns[0][0] : signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
-        console.log("[v0 WALLET] Requesting Defly wallet signature...")
-        const signedTxns = await deflyWallet.signTransaction([singleTxnArray])
-        console.log("[v0 WALLET] Defly signature response received, length:", signedTxns.length)
-        signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Extracted signed transaction")
+        console.log("[v0 WALLET] Requesting Defly signature")
+        
+        const txnGroup = [{ txn: transaction }]
+        const signedTxns = await deflyWallet.signTransaction([txnGroup])
+        
+        console.log("[v0 WALLET] Defly response:", signedTxns)
+        
+        signedTxn = Array.isArray(signedTxns[0]) ? signedTxns[0][0] : signedTxns[0]
       }
 
-      console.log("[v0 WALLET] Sending signed transaction to network...")
+      console.log("[v0 WALLET] Sending to network...")
       const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
       console.log("[v0 WALLET] Transaction sent! ID:", txId)
 
       console.log("[v0 WALLET] Waiting for confirmation...")
       await algosdk.waitForConfirmation(algodClient, txId, 4)
       console.log("[v0 WALLET] Transaction confirmed!")
-      console.log("[v0 WALLET] ===== PAYMENT COMPLETE =====")
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0 WALLET] ===== PAYMENT FAILED =====")
-      console.error("[v0 WALLET] Error:", error)
+      console.error("[v0 WALLET] Payment error:", error)
       if (error instanceof Error) {
-        console.error("[v0 WALLET] Error message:", error.message)
-        console.error("[v0 WALLET] Error stack:", error.stack)
+        console.error("[v0 WALLET] Error details:", error.message)
       }
       throw error
     } finally {
