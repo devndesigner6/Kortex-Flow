@@ -43,10 +43,19 @@ export class AlgorandPaymentHandler {
 
   async sendPayment(params: PaymentParams, senderAddress: string): Promise<PaymentResult> {
     try {
+      if (!senderAddress || senderAddress.trim() === "") {
+        console.error("[v0] Address must not be null or undefined")
+        return {
+          success: false,
+          error: "Address must not be null or undefined",
+        }
+      }
+
       console.log("[v0] Starting payment transaction:", {
         amount: params.amount,
         network: this.network,
         wallet: params.walletType,
+        address: senderAddress,
       })
 
       const txnBytes = await this.createPaymentTransaction(senderAddress, params.amount, params.note)

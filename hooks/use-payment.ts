@@ -11,10 +11,21 @@ export function usePayment() {
   const [network, setNetwork] = useState<AlgorandNetwork>("testnet")
 
   const processPayment = async (amount: number, note?: string): Promise<PaymentResult> => {
+    console.log("[v0 PAYMENT] Processing payment with:", { walletAddress, walletType, amount })
+    
     if (!walletAddress || !walletType) {
+      console.error("[v0 PAYMENT] Wallet not connected:", { walletAddress, walletType })
       return {
         success: false,
         error: "Wallet not connected",
+      }
+    }
+
+    if (walletAddress.trim() === "") {
+      console.error("[v0 PAYMENT] Wallet address is empty")
+      return {
+        success: false,
+        error: "Address must not be null or undefined",
       }
     }
 
