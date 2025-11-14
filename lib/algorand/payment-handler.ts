@@ -108,8 +108,15 @@ export class AlgorandPaymentHandler {
 
   async getBalance(address: string): Promise<number> {
     try {
-      const accountInfo = await this.algodClient.accountInformation(address).do()
-      return accountInfo.amount
+      const response = await fetch(`/api/algorand/balance?address=${address}&network=${this.network}`)
+      
+      if (!response.ok) {
+        console.error("[v0] Failed to fetch balance from API:", response.status)
+        return 0
+      }
+
+      const data = await response.json()
+      return data.balance || 0
     } catch (error) {
       console.error("[v0] Failed to fetch balance:", error)
       return 0
