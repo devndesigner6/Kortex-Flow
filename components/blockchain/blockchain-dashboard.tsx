@@ -3,17 +3,13 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
-import { PeraWalletConnect } from "@perawallet/connect"
+import { useRouter } from 'next/navigation'
+import { getPeraWallet } from "@/lib/algorand/wallet-client"
 
 interface BlockchainDashboardProps {
   userId: string
   userEmail: string
 }
-
-const peraWallet = new PeraWalletConnect({
-  chainId: 416001, // Algorand TestNet
-})
 
 export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardProps) {
   const router = useRouter()
@@ -23,6 +19,8 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
   const [contractAddress] = useState<string>("ALGO_CONTRACT_PLACEHOLDER")
   const [oracleStatus] = useState<"active" | "inactive">("inactive")
   const [isConnecting, setIsConnecting] = useState(false)
+  
+  const peraWallet = getPeraWallet()
 
   useEffect(() => {
     peraWallet
