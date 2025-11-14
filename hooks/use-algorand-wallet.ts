@@ -210,22 +210,32 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         amount: transaction.amount,
       })
 
-      const txnsToSign = [{ txn: transaction }]
-      console.log("[v0 WALLET] Transaction prepared for signing")
+      const singleTxnArray = [{ txn: transaction }]
+      console.log("[v0 WALLET] Single txn array:", singleTxnArray)
 
       let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
         console.log("[v0 WALLET] Requesting Pera wallet signature...")
-        const signedTxns = await peraWallet.signTransaction([txnsToSign])
-        console.log("[v0 WALLET] Pera signature response received, length:", signedTxns.length)
+        console.log("[v0 WALLET] Passing to signTransaction:", singleTxnArray)
+        
+        const signedTxns = await peraWallet.signTransaction([singleTxnArray])
+        
+        console.log("[v0 WALLET] Pera signature response type:", typeof signedTxns)
+        console.log("[v0 WALLET] Pera signature response:", signedTxns)
+        console.log("[v0 WALLET] Is array?:", Array.isArray(signedTxns))
+        if (Array.isArray(signedTxns)) {
+          console.log("[v0 WALLET] Array length:", signedTxns.length)
+          console.log("[v0 WALLET] First element type:", typeof signedTxns[0])
+          console.log("[v0 WALLET] First element:", signedTxns[0])
+        }
         signedTxn = signedTxns[0]
         console.log("[v0 WALLET] Extracted signed transaction")
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 WALLET] Requesting Defly wallet signature...")
-        const signedTxns = await deflyWallet.signTransaction([txnsToSign])
+        const signedTxns = await deflyWallet.signTransaction([singleTxnArray])
         console.log("[v0 WALLET] Defly signature response received, length:", signedTxns.length)
         signedTxn = signedTxns[0]
         console.log("[v0 WALLET] Extracted signed transaction")
