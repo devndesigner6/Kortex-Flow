@@ -209,23 +209,23 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         const peraWallet = getPeraWallet()
         console.log("[v0 WALLET] Requesting Pera signature")
         
-        // Pera expects: SignerTransaction[][] (array of transaction groups)
-        const txnGroup = [{ txn: transaction }]
+        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
         const signedTxns = await peraWallet.signTransaction([txnGroup])
         
-        console.log("[v0 WALLET] Pera response:", signedTxns)
+        console.log("[v0 WALLET] Pera signature received, type:", typeof signedTxns)
+        console.log("[v0 WALLET] signedTxns:", signedTxns)
         
-        signedTxn = Array.isArray(signedTxns[0]) ? signedTxns[0][0] : signedTxns[0]
+        signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 WALLET] Requesting Defly signature")
         
-        const txnGroup = [{ txn: transaction }]
+        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
         const signedTxns = await deflyWallet.signTransaction([txnGroup])
         
-        console.log("[v0 WALLET] Defly response:", signedTxns)
+        console.log("[v0 WALLET] Defly signature received")
         
-        signedTxn = Array.isArray(signedTxns[0]) ? signedTxns[0][0] : signedTxns[0]
+        signedTxn = signedTxns[0]
       }
 
       console.log("[v0 WALLET] Sending to network...")
@@ -241,7 +241,8 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
     } catch (error) {
       console.error("[v0 WALLET] Payment error:", error)
       if (error instanceof Error) {
-        console.error("[v0 WALLET] Error details:", error.message)
+        console.error("[v0 WALLET] Error message:", error.message)
+        console.error("[v0 WALLET] Error stack:", error.stack)
       }
       throw error
     } finally {
