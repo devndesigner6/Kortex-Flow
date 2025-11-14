@@ -16,6 +16,9 @@ export interface PaymentResult {
   error?: string
 }
 
+let peraWalletInstance: PeraWalletConnect | null = null
+let deflyWalletInstance: DeflyWalletConnect | null = null
+
 export class AlgorandPaymentHandler {
   private algodClient: algosdk.Algodv2
   private network: AlgorandNetwork
@@ -24,6 +27,20 @@ export class AlgorandPaymentHandler {
     this.network = network
     const config = getNetworkConfig(network)
     this.algodClient = new algosdk.Algodv2(config.nodeToken, config.nodeServer, config.nodePort)
+  }
+
+  private getPeraWallet(): PeraWalletConnect {
+    if (!peraWalletInstance) {
+      peraWalletInstance = new PeraWalletConnect()
+    }
+    return peraWalletInstance
+  }
+
+  private getDeflyWallet(): DeflyWalletConnect {
+    if (!deflyWalletInstance) {
+      deflyWalletInstance = new DeflyWalletConnect()
+    }
+    return deflyWalletInstance
   }
 
   async createPaymentTransaction(senderAddress: string, amount: number, note?: string): Promise<Uint8Array> {
@@ -43,15 +60,17 @@ export class AlgorandPaymentHandler {
 
   async sendPayment(params: PaymentParams, senderAddress: string): Promise<PaymentResult> {
     try {
+      console.log("[v0 PAYMENT] Validating address:", senderAddress)
+      
       if (!senderAddress || senderAddress.trim() === "") {
-        console.error("[v0] Address must not be null or undefined")
+        console.error("[v0 PAYMENT] Address validation failed - address is null or empty")
         return {
           success: false,
           error: "Address must not be null or undefined",
         }
       }
 
-      console.log("[v0] Starting payment transaction:", {
+      console.log("[v0 PAYMENT] Starting payment transaction:", {
         amount: params.amount,
         network: this.network,
         wallet: params.walletType,
@@ -61,6 +80,8 @@ export class AlgorandPaymentHandler {
       const suggestedParams = await this.algodClient.getTransactionParams().do()
       const treasuryAddress = TREASURY_WALLET[this.network]
 
+      console.log("[v0 PAYMENT] Creating transaction from", senderAddress, "to", treasuryAddress)
+
       const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: senderAddress,
         to: treasuryAddress,
@@ -69,45 +90,55 @@ export class AlgorandPaymentHandler {
         suggestedParams,
       })
 
-      console.log("[v0] Transaction created:", {
+      console.log("[v0 PAYMENT] Transaction object created successfully:", {
         from: txn.from.toString(),
         to: txn.to.toString(),
-        amount: params.amount,
+        amount: txn.amount,
       })
 
       let signedTxn: Uint8Array
 
       if (params.walletType === "pera") {
-        const peraWallet = new PeraWalletConnect()
-        // Pera wallet needs the transaction as an array of single transaction groups
+        console.log("[v0 PAYMENT] Using Pera wallet for signing")
+        const peraWallet = this.getPeraWallet()
+        
+        // Reconnect to existing session
+        const accounts = await peraWallet.reconnectSession()
+        console.log("[v0 PAYMENT] Pera wallet accounts:", accounts)
+        
         const singleTxnGroup = [{ txn: txn }]
         const signedTxnArray = await peraWallet.signTransaction([singleTxnGroup])
         signedTxn = signedTxnArray[0]
       } else {
-        const deflyWallet = new DeflyWalletConnect()
-        // Defly wallet needs the transaction as an array of single transaction groups
+        console.log("[v0 PAYMENT] Using Defly wallet for signing")
+        const deflyWallet = this.getDeflyWallet()
+        
+        // Reconnect to existing session
+        const accounts = await deflyWallet.reconnectSession()
+        console.log("[v0 PAYMENT] Defly wallet accounts:", accounts)
+        
         const singleTxnGroup = [{ txn: txn }]
         const signedTxnArray = await deflyWallet.signTransaction([singleTxnGroup])
         signedTxn = signedTxnArray[0]
       }
 
-      console.log("[v0] Transaction signed successfully")
+      console.log("[v0 PAYMENT] Transaction signed successfully")
 
       const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do()
 
-      console.log("[v0] Payment transaction sent:", txId)
+      console.log("[v0 PAYMENT] Payment transaction sent:", txId)
 
       // Wait for confirmation
       await this.waitForConfirmation(txId)
 
-      console.log("[v0] Payment confirmed:", txId)
+      console.log("[v0 PAYMENT] Payment confirmed:", txId)
 
       return {
         success: true,
         txId,
       }
     } catch (error) {
-      console.error("[v0] Payment failed:", error)
+      console.error("[v0 PAYMENT] Payment failed:", error)
       return {
         success: false,
         error: error instanceof Error ? error.message : "Payment failed",
