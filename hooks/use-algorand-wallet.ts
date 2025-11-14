@@ -193,7 +193,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
-      const txnArray = [{ txn: transaction }]
+      const txnArray = [{ txn: transaction, signers: [walletAddress] }]
       let signedTxn
 
       if (walletType === "pera") {
@@ -205,7 +205,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       }
 
       console.log("[v0] Transaction signed, sending...")
-      const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
+      const { txId } = await algodClient.sendRawTransaction(signedTxn[0]).do()
       console.log("[v0] Transaction sent, ID:", txId)
 
       await algosdk.waitForConfirmation(algodClient, txId, 4)
