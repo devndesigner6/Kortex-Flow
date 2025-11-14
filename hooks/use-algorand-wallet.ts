@@ -178,43 +178,51 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
   const sendPayment = async (recipient: string, amount: number) => {
     if (!walletAddress || !walletType) {
-      console.error("[v0] No wallet connected")
+      console.error("[v0 WALLET] No wallet connected")
       throw new Error("No wallet connected")
     }
 
     setIsSending(true)
     try {
-      console.log("[v0] Sending payment:", { recipient, amount })
+      console.log("[v0 WALLET] Starting payment transaction:", { recipient, amount, from: walletAddress })
+      
       const params = await algodClient.getTransactionParams().do()
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: walletAddress,
         to: recipient,
-        amount: amount * 1_000_000,
+        amount: Math.floor(amount * 1_000_000), // Convert ALGO to microAlgos
         suggestedParams: params,
       })
 
-      const txnArray = [{ txn: transaction, signers: [walletAddress] }]
       let signedTxn
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        signedTxn = await peraWallet.signTransaction([txnArray])
+        console.log("[v0 WALLET] Signing with Pera wallet")
+        // Pera expects array of transaction objects with txn field
+        const txnsToSign = [{ txn: transaction }]
+        signedTxn = await peraWallet.signTransaction(txnsToSign)
       } else {
         const deflyWallet = getDeflyWallet()
-        signedTxn = await deflyWallet.signTransaction([txnArray])
+        console.log("[v0 WALLET] Signing with Defly wallet")
+        // Defly expects array of transaction objects with txn field
+        const txnsToSign = [{ txn: transaction }]
+        signedTxn = await deflyWallet.signTransaction(txnsToSign)
       }
 
-      console.log("[v0] Transaction signed, sending...")
+      console.log("[v0 WALLET] Transaction signed successfully, sending to network...")
       const { txId } = await algodClient.sendRawTransaction(signedTxn[0]).do()
-      console.log("[v0] Transaction sent, ID:", txId)
+      console.log("[v0 WALLET] Transaction sent, ID:", txId)
 
+      console.log("[v0 WALLET] Waiting for confirmation...")
       await algosdk.waitForConfirmation(algodClient, txId, 4)
-      console.log("[v0] Transaction confirmed")
+      console.log("[v0 WALLET] Transaction confirmed!")
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0] Error sending payment:", error)
+      console.error("[v0 WALLET] Error sending payment:", error)
+      console.error("[v0 WALLET] Error details:", error instanceof Error ? error.message : String(error))
       throw error
     } finally {
       setIsSending(false)
