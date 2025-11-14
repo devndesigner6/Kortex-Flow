@@ -70,8 +70,8 @@ export class AlgorandPaymentHandler {
       })
 
       console.log("[v0] Transaction created:", {
-        from: senderAddress,
-        to: treasuryAddress,
+        from: txn.from.toString(),
+        to: txn.to.toString(),
         amount: params.amount,
       })
 
@@ -79,11 +79,15 @@ export class AlgorandPaymentHandler {
 
       if (params.walletType === "pera") {
         const peraWallet = new PeraWalletConnect()
-        const signedTxnArray = await peraWallet.signTransaction([[{ txn, signers: [senderAddress] }]])
+        // Pera wallet needs the transaction as an array of single transaction groups
+        const singleTxnGroup = [{ txn: txn }]
+        const signedTxnArray = await peraWallet.signTransaction([singleTxnGroup])
         signedTxn = signedTxnArray[0]
       } else {
         const deflyWallet = new DeflyWalletConnect()
-        const signedTxnArray = await deflyWallet.signTransaction([[{ txn, signers: [senderAddress] }]])
+        // Defly wallet needs the transaction as an array of single transaction groups
+        const singleTxnGroup = [{ txn: txn }]
+        const signedTxnArray = await deflyWallet.signTransaction([singleTxnGroup])
         signedTxn = signedTxnArray[0]
       }
 
