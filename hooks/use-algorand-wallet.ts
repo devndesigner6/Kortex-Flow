@@ -26,21 +26,31 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   const fetchBalance = useCallback(
     async (addr: string) => {
       try {
-        console.log("[v0] Fetching balance via API for:", addr, "on", network)
+        console.log("[v0 WALLET] ===== FETCHING BALANCE =====")
+        console.log("[v0 WALLET] Address:", addr)
+        console.log("[v0 WALLET] Network:", network)
+        
+        const url = `/api/algorand/balance?address=${addr}&network=${network}`
+        console.log("[v0 WALLET] API URL:", url)
 
-        const response = await fetch(`/api/algorand/balance?address=${addr}&network=${network}`)
+        const response = await fetch(url)
+        console.log("[v0 WALLET] Response status:", response.status)
+        
         const data = await response.json()
+        console.log("[v0 WALLET] Response data:", data)
 
         if (!response.ok) {
-          console.error("[v0] API error:", data)
+          console.error("[v0 WALLET] API error response:", data)
           setBalance(0)
           return
         }
 
-        console.log("[v0] Balance received from API:", data.balance, "ALGO")
+        console.log("[v0 WALLET] Setting balance to:", data.balance)
         setBalance(data.balance)
+        console.log("[v0 WALLET] ===== BALANCE FETCH COMPLETE =====")
       } catch (error) {
-        console.error("[v0] Error fetching balance:", error)
+        console.error("[v0 WALLET] Fetch error:", error)
+        console.error("[v0 WALLET] Error details:", error instanceof Error ? error.message : String(error))
         setBalance(0)
       }
     },
@@ -88,8 +98,10 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   const connectPera = async () => {
     setIsConnecting(true)
     try {
+      console.log("[v0 WALLET] ===== CONNECTING PERA =====")
       const peraWallet = getPeraWallet()
       const accounts = await peraWallet.connect()
+      console.log("[v0 WALLET] Pera accounts received:", accounts)
 
       peraWallet.connector?.on("disconnect", () => {
         console.log("[v0] Pera wallet disconnected")
@@ -101,15 +113,16 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       })
 
       if (accounts.length > 0) {
-        console.log("[v0] Pera wallet connected:", accounts[0])
+        console.log("[v0 WALLET] Setting Pera wallet address:", accounts[0])
         localStorage.setItem(WALLET_TYPE_KEY, "pera")
         localStorage.setItem(WALLET_ADDRESS_KEY, accounts[0])
 
         setWalletAddress(accounts[0])
         setWalletType("pera")
+        console.log("[v0 WALLET] ===== PERA CONNECTION COMPLETE =====")
       }
     } catch (error) {
-      console.error("[v0] Error connecting to Pera:", error)
+      console.error("[v0 WALLET] Pera connection error:", error)
     } finally {
       setIsConnecting(false)
     }
