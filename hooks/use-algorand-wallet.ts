@@ -26,23 +26,25 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
   const fetchBalance = useCallback(
     async (addr: string) => {
       try {
-        console.log("[v0] Fetching balance for address:", addr)
-        console.log("[v0] Using network:", network)
-        console.log("[v0] API endpoint:", networkConfig.nodeServer)
+        console.log("[v0] Fetching balance via API for:", addr, "on", network)
 
-        const accountInfo = await algodClient.accountInformation(addr).do()
-        console.log("[v0] Raw account info:", accountInfo)
+        const response = await fetch(`/api/algorand/balance?address=${addr}&network=${network}`)
+        const data = await response.json()
 
-        const algoBalance = accountInfo.amount / 1_000_000 // Convert microAlgos to Algos
-        console.log("[v0] Balance calculated:", algoBalance, "ALGO")
+        if (!response.ok) {
+          console.error("[v0] API error:", data)
+          setBalance(0)
+          return
+        }
 
-        setBalance(algoBalance)
+        console.log("[v0] Balance received from API:", data.balance, "ALGO")
+        setBalance(data.balance)
       } catch (error) {
         console.error("[v0] Error fetching balance:", error)
         setBalance(0)
       }
     },
-    [network, networkConfig.nodeServer, algodClient],
+    [network],
   )
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       console.log("[v0] Network or wallet changed, refetching balance")
       fetchBalance(walletAddress)
     }
-  }, [walletAddress, fetchBalance])
+  }, [walletAddress, network, fetchBalance])
 
   useEffect(() => {
     const restoreConnection = async () => {
@@ -62,7 +64,6 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         setWalletType(savedWalletType)
         setWalletAddress(savedAddress)
 
-        // Reconnect to the wallet SDK
         try {
           if (savedWalletType === "pera") {
             const peraWallet = getPeraWallet()
@@ -73,7 +74,6 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
           }
         } catch (error) {
           console.error("[v0] Error reconnecting wallet:", error)
-          // Clear invalid session
           localStorage.removeItem(WALLET_TYPE_KEY)
           localStorage.removeItem(WALLET_ADDRESS_KEY)
           setWalletType(null)
@@ -176,7 +176,7 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: walletAddress,
         to: recipient,
-        amount: amount * 1_000_000, // Convert Algos to microAlgos
+        amount: amount * 1_000_000,
         suggestedParams: params,
       })
 
