@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAlgorandWallet } from "@/hooks/use-algorand-wallet"
-import { Wallet, Copy, RefreshCw, Send } from "lucide-react"
+import { Wallet, Copy, RefreshCw, Send } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 import { NetworkSwitcher } from "@/components/blockchain/network-switcher"
 
@@ -13,6 +13,9 @@ export default function BlockchainPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [network, setNetwork] = useState<"testnet" | "mainnet">("testnet")
+  const [debugInfo, setDebugInfo] = useState<string>("")
+  const [recipient, setRecipient] = useState("")
+  const [amount, setAmount] = useState("")
 
   const {
     address,
@@ -25,9 +28,6 @@ export default function BlockchainPage() {
     refreshBalance,
     sendPayment,
   } = useAlgorandWallet(network)
-
-  const [recipient, setRecipient] = useState("")
-  const [amount, setAmount] = useState("")
 
   const copyAddress = () => {
     if (address) {
@@ -54,6 +54,16 @@ export default function BlockchainPage() {
 
   const truncateAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+  }
+
+  const handleRefreshBalance = async () => {
+    setDebugInfo("Starting balance refresh...")
+    try {
+      await refreshBalance()
+      setDebugInfo(`Balance updated: ${balance} ALGO at ${new Date().toLocaleTimeString()}`)
+    } catch (error) {
+      setDebugInfo(`Error: ${error instanceof Error ? error.message : "Failed to fetch balance"}`)
+    }
   }
 
   return (
@@ -113,6 +123,24 @@ export default function BlockchainPage() {
             </div>
           ) : (
             <>
+              {debugInfo && (
+                <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-4">
+                  <p className="font-mono text-sm text-yellow-500">{debugInfo}</p>
+                </div>
+              )}
+
+              <div className="rounded-lg border border-blue-500/50 bg-blue-500/10 p-4">
+                <p className="font-mono text-sm text-blue-500">
+                  Connected Address: {address}
+                </p>
+                <p className="font-mono text-sm text-blue-500">
+                  Network: {network.toUpperCase()}
+                </p>
+                <p className="font-mono text-sm text-blue-500">
+                  Balance API: /api/algorand/balance?address={address.slice(0, 8)}...&network={network}
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="rounded-lg border border-primary/30 p-6">
                   <div className="mb-4 flex items-center gap-2">
@@ -153,10 +181,13 @@ export default function BlockchainPage() {
                       {balance.toFixed(6)}
                     </div>
                     <div className="font-serif text-lg text-muted-foreground sm:text-xl">ALGO</div>
+                    <div className="mt-2 font-mono text-xs text-muted-foreground">
+                      Click refresh to update
+                    </div>
                   </div>
 
                   <Button
-                    onClick={refreshBalance}
+                    onClick={handleRefreshBalance}
                     variant="outline"
                     className="flex h-12 w-full items-center justify-center gap-2 border-primary bg-transparent font-serif text-lg text-primary hover:bg-primary/10 sm:text-xl"
                   >

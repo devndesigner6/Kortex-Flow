@@ -26,9 +26,11 @@ export async function GET(request: NextRequest) {
     
     console.log("[v0 API] Fetching account information...")
     const accountInfo = await algodClient.accountInformation(address).do()
-    console.log("[v0 API] Account info received:", JSON.stringify(accountInfo, null, 2))
-
-    const balance = accountInfo.amount / 1_000_000
+    
+    const microAlgos = Number(accountInfo.amount)
+    const balance = microAlgos / 1_000_000
+    
+    console.log("[v0 API] Micro ALGOs:", microAlgos)
     console.log("[v0 API] Calculated balance:", balance, "ALGO")
     console.log("[v0 API] ===== BALANCE REQUEST COMPLETE =====")
 
@@ -37,7 +39,6 @@ export async function GET(request: NextRequest) {
     console.error("[v0 API] ===== ERROR =====")
     console.error("[v0 API] Error type:", error instanceof Error ? error.constructor.name : typeof error)
     console.error("[v0 API] Error message:", error instanceof Error ? error.message : String(error))
-    console.error("[v0 API] Full error:", error)
     
     return NextResponse.json(
       { 
