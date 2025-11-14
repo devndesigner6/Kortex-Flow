@@ -195,20 +195,26 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
+      console.log("[v0 WALLET] Transaction created:", {
+        from: walletAddress,
+        to: recipient,
+        amount: Math.floor(amount * 1_000_000),
+      })
+
       let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
         console.log("[v0 WALLET] Signing with Pera wallet")
-        const txnsToSign = [{ txn: transaction }]
-        const signedTxns = await peraWallet.signTransaction(txnsToSign)
+        const signedTxns = await peraWallet.signTransaction([{ txn: transaction }])
         signedTxn = signedTxns[0]
+        console.log("[v0 WALLET] Pera signature complete")
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 WALLET] Signing with Defly wallet")
-        const txnsToSign = [{ txn: transaction }]
-        const signedTxns = await deflyWallet.signTransaction(txnsToSign)
+        const signedTxns = await deflyWallet.signTransaction([{ txn: transaction }])
         signedTxn = signedTxns[0]
+        console.log("[v0 WALLET] Defly signature complete")
       }
 
       console.log("[v0 WALLET] Transaction signed successfully, sending to network...")
