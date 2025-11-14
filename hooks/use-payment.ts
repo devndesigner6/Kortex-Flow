@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { AlgorandPaymentHandler, type PaymentResult } from "@/lib/algorand/payment-handler"
+import type { PaymentResult } from "@/lib/algorand/payment-handler"
 import { useAlgorandWallet } from "./use-algorand-wallet"
 import type { AlgorandNetwork } from "@/lib/algorand/config"
+import { TREASURY_WALLET } from "@/lib/algorand/config"
 
 export function usePayment() {
-  const { walletAddress, walletType, balance } = useAlgorandWallet()
+  const { walletAddress, walletType, balance, sendPayment: walletSendPayment } = useAlgorandWallet()
   const [isProcessing, setIsProcessing] = useState(false)
   const [network, setNetwork] = useState<AlgorandNetwork>("testnet")
 
@@ -32,18 +33,27 @@ export function usePayment() {
     setIsProcessing(true)
 
     try {
-      const handler = new AlgorandPaymentHandler(network)
-      const result = await handler.sendPayment(
-        {
-          amount,
-          note,
-          walletType,
-          network,
-        },
-        walletAddress,
-      )
-
-      return result
+      // Use the treasury wallet address for the current network
+      const treasuryAddress = TREASURY_WALLET[network]
+      
+      console.log("[v0 PAYMENT] Sending to treasury:", treasuryAddress)
+      console.log("[v0 PAYMENT] Amount in ALGO:", amount / 1_000_000)
+      
+      // walletSendPayment expects amount in ALGO, so convert from microAlgos
+      const txId = await walletSendPayment(treasuryAddress, amount / 1_000_000)
+      
+      console.log("[v0 PAYMENT] Payment successful, txId:", txId)
+      
+      return {
+        success: true,
+        txId,
+      }
+    } catch (error) {
+      console.error("[v0 PAYMENT] Payment error:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Payment failed",
+      }
     } finally {
       setIsProcessing(false)
     }
