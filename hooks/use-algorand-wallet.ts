@@ -194,24 +194,26 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
-      let signedTxn
+      let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
         console.log("[v0 WALLET] Signing with Pera wallet")
-        // Pera expects array of transaction objects with txn field
-        const txnsToSign = [{ txn: transaction }]
-        signedTxn = await peraWallet.signTransaction(txnsToSign)
+        // Pera wallet expects the transaction as bytes
+        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
+        const signedTxns = await peraWallet.signTransaction([txnGroup])
+        signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 WALLET] Signing with Defly wallet")
-        // Defly expects array of transaction objects with txn field
-        const txnsToSign = [{ txn: transaction }]
-        signedTxn = await deflyWallet.signTransaction(txnsToSign)
+        // Defly wallet expects the transaction as bytes
+        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
+        const signedTxns = await deflyWallet.signTransaction([txnGroup])
+        signedTxn = signedTxns[0]
       }
 
       console.log("[v0 WALLET] Transaction signed successfully, sending to network...")
-      const { txId } = await algodClient.sendRawTransaction(signedTxn[0]).do()
+      const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
       console.log("[v0 WALLET] Transaction sent, ID:", txId)
 
       console.log("[v0 WALLET] Waiting for confirmation...")
