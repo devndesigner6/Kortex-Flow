@@ -58,19 +58,36 @@ export class AlgorandPaymentHandler {
         address: senderAddress,
       })
 
-      const txnBytes = await this.createPaymentTransaction(senderAddress, params.amount, params.note)
+      const suggestedParams = await this.algodClient.getTransactionParams().do()
+      const treasuryAddress = TREASURY_WALLET[this.network]
+
+      const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: senderAddress,
+        to: treasuryAddress,
+        amount: params.amount,
+        note: params.note ? new TextEncoder().encode(params.note) : undefined,
+        suggestedParams,
+      })
+
+      console.log("[v0] Transaction created:", {
+        from: senderAddress,
+        to: treasuryAddress,
+        amount: params.amount,
+      })
 
       let signedTxn: Uint8Array
 
       if (params.walletType === "pera") {
         const peraWallet = new PeraWalletConnect()
-        const [signed] = await peraWallet.signTransaction([[{ txn: txnBytes, signers: [senderAddress] }]])
-        signedTxn = signed
+        const signedTxnArray = await peraWallet.signTransaction([[{ txn, signers: [senderAddress] }]])
+        signedTxn = signedTxnArray[0]
       } else {
         const deflyWallet = new DeflyWalletConnect()
-        const [signed] = await deflyWallet.signTransaction([[{ txn: txnBytes, signers: [senderAddress] }]])
-        signedTxn = signed
+        const signedTxnArray = await deflyWallet.signTransaction([[{ txn, signers: [senderAddress] }]])
+        signedTxn = signedTxnArray[0]
       }
+
+      console.log("[v0] Transaction signed successfully")
 
       const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do()
 
