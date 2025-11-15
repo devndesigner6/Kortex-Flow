@@ -183,11 +183,11 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
     setIsSending(true)
     try {
-      console.log("[v0 PAYMENT] Getting balance from wallet hook:", balance)
-      console.log("[v0 PAYMENT MODAL] Setting balance to:", balance)
-      console.log("[v0 PAYMENT] Processing payment with:", { recipient, amount, walletType })
-      console.log("[v0 PAYMENT] Sending to treasury:", recipient)
-      console.log("[v0 PAYMENT] Amount in ALGO:", amount)
+      console.log("[v0 PAYMENT DEBUG] ===== PAYMENT START =====")
+      console.log("[v0 PAYMENT DEBUG] Connected wallet type:", walletType)
+      console.log("[v0 PAYMENT DEBUG] Connected wallet address:", walletAddress)
+      console.log("[v0 PAYMENT DEBUG] Recipient:", recipient)
+      console.log("[v0 PAYMENT DEBUG] Amount:", amount)
       
       const params = await algodClient.getTransactionParams().do()
       const amountInMicroAlgos = Math.floor(amount * 1_000_000)
@@ -199,32 +199,51 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
-      console.log("[v0 WALLET] Starting payment transaction:", { walletAddress, recipient, amountInMicroAlgos })
-      console.log("[v0 WALLET] Getting balance from wallet hook:", balance)
-      console.log("[v0 PAYMENT MODAL] Setting balance to:", balance)
+      console.log("[v0 PAYMENT] Transaction created with ID:", txn.txID())
 
-      let signedTxns: Uint8Array[]
+      let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        console.log("[v0] Sending payment:", { recipient, amount })
-        signedTxns = await peraWallet.signTransaction([[{ txn }]])
+        
+        console.log("[v0 PAYMENT DEBUG] Pera wallet instance:", peraWallet)
+        console.log("[v0 PAYMENT DEBUG] Pera wallet connector:", peraWallet.connector)
+        
+        if (peraWallet.connector) {
+          console.log("[v0 PAYMENT DEBUG] Pera connector accounts:", peraWallet.connector.accounts)
+          console.log("[v0 PAYMENT DEBUG] Pera connector connected:", peraWallet.connector.connected)
+        }
+        
+        console.log("[v0 PAYMENT] Signing with Pera wallet...")
+        
+        const txnGroup = [[{ txn, signers: [walletAddress] }]]
+        console.log("[v0 PAYMENT] Transaction group to sign:", txnGroup)
+        
+        const signedTxns = await peraWallet.signTransaction(txnGroup)
+        console.log("[v0 PAYMENT] Pera returned signed transactions:", signedTxns)
+        signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
-        console.log("[v0] Sending payment:", { recipient, amount })
-        signedTxns = await deflyWallet.signTransaction([[{ txn }]])
+        console.log("[v0 PAYMENT] Signing with Defly wallet...")
+        
+        const txnGroup = [[{ txn, signers: [walletAddress] }]]
+        const signedTxns = await deflyWallet.signTransaction(txnGroup)
+        signedTxn = signedTxns[0]
       }
 
-      console.log("[v0] Sending transaction:", { txId: txn.txID() })
-      const { txId } = await algodClient.sendRawTransaction(signedTxns[0]).do()
+      console.log("[v0 PAYMENT] Sending signed transaction to network...")
+      const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
+      console.log("[v0 PAYMENT] Transaction sent with ID:", txId)
       
+      console.log("[v0 PAYMENT] Waiting for confirmation...")
       await algosdk.waitForConfirmation(algodClient, txId, 4)
-      console.log("[v0] Payment confirmed:", txId)
+      console.log("[v0 PAYMENT] Payment confirmed:", txId)
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0] Error sending payment:", error)
+      console.error("[v0 PAYMENT] Payment error:", error)
+      console.error("[v0 PAYMENT] Error message:", error instanceof Error ? error.message : String(error))
       throw error
     } finally {
       setIsSending(false)
