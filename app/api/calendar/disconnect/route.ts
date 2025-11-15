@@ -13,8 +13,7 @@ export async function POST() {
   }
 
   try {
-    // Remove Calendar access token from profile
-    const { error } = await supabase
+    const { error: tokenError } = await supabase
       .from("profiles")
       .update({
         calendar_access_token: null,
@@ -22,9 +21,19 @@ export async function POST() {
       })
       .eq("id", user.id)
 
-    if (error) {
-      console.error("[v0] Error disconnecting Calendar:", error)
-      throw error
+    if (tokenError) {
+      console.error("[v0] Error clearing Calendar tokens:", tokenError)
+      throw tokenError
+    }
+
+    const { error: eventsError } = await supabase
+      .from("calendar_events")
+      .delete()
+      .eq("user_id", user.id)
+
+    if (eventsError) {
+      console.error("[v0] Error deleting calendar events:", eventsError)
+      throw eventsError
     }
 
     return NextResponse.json({ success: true })

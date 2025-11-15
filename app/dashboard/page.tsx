@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation'
 import { createClient } from "@/lib/supabase/server"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { UpcomingEvents } from "@/components/dashboard/upcoming-events"
@@ -49,25 +49,29 @@ export default async function DashboardPage() {
     .catch(() => ({ data: [] }))
 
   // Fetch upcoming calendar events with error handling
-  const { data: events } = await supabase
-    .from("calendar_events")
-    .select("*")
-    .eq("user_id", user.id)
-    .gte("start_time", new Date().toISOString())
-    .order("start_time", { ascending: true })
-    .limit(5)
-    .then((res) => ({ data: res.data || [] }))
-    .catch(() => ({ data: [] }))
+  const { data: events } = isCalendarConnected
+    ? await supabase
+        .from("calendar_events")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("start_time", new Date().toISOString())
+        .order("start_time", { ascending: true })
+        .limit(5)
+        .then((res) => ({ data: res.data || [] }))
+        .catch(() => ({ data: [] }))
+    : { data: [] }
 
   // Fetch recent emails with error handling
-  const { data: emails } = await supabase
-    .from("emails")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("received_at", { ascending: false })
-    .limit(5)
-    .then((res) => ({ data: res.data || [] }))
-    .catch(() => ({ data: [] }))
+  const { data: emails } = isGmailConnected
+    ? await supabase
+        .from("emails")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("received_at", { ascending: false })
+        .limit(5)
+        .then((res) => ({ data: res.data || [] }))
+        .catch(() => ({ data: [] }))
+    : { data: [] }
 
   return (
     <div className="page-transition min-h-screen w-full overflow-x-hidden bg-background px-3 py-4 transition-colors duration-300 sm:px-4 sm:py-6">

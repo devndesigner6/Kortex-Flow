@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, MapPin, Clock, CheckCircle2 } from "lucide-react"
+import { Calendar, MapPin, Clock, CheckCircle2 } from 'lucide-react'
 
 interface CalendarEvent {
   id: string
@@ -64,7 +64,11 @@ export function UpcomingEvents({ events }: UpcomingEventsProps) {
       </CardHeader>
       <CardContent>
         {events.length === 0 ? (
-          <p className="font-mono text-sm text-muted-foreground">No events scheduled.</p>
+          <div className="text-center py-6">
+            <p className="font-mono text-sm text-muted-foreground">
+              Connect Calendar to sync your events
+            </p>
+          </div>
         ) : (
           <div className="space-y-3">
             {events.map((event) => (

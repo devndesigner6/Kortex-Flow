@@ -13,8 +13,7 @@ export async function POST() {
   }
 
   try {
-    // Remove Gmail access token from profile
-    const { error } = await supabase
+    const { error: tokenError } = await supabase
       .from("profiles")
       .update({
         gmail_access_token: null,
@@ -22,9 +21,19 @@ export async function POST() {
       })
       .eq("id", user.id)
 
-    if (error) {
-      console.error("[v0] Error disconnecting Gmail:", error)
-      throw error
+    if (tokenError) {
+      console.error("[v0] Error clearing Gmail tokens:", tokenError)
+      throw tokenError
+    }
+
+    const { error: emailsError } = await supabase
+      .from("emails")
+      .delete()
+      .eq("user_id", user.id)
+
+    if (emailsError) {
+      console.error("[v0] Error deleting emails:", emailsError)
+      throw emailsError
     }
 
     return NextResponse.json({ success: true })

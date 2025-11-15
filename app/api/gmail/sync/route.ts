@@ -39,7 +39,11 @@ export async function POST() {
     let accessToken = profile.gmail_access_token
     console.log("[v0] Starting Gmail fetch with access token (length:", accessToken.length, ")")
 
-    let gmailResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100", {
+    // Use Gmail's category labels: CATEGORY_PRIMARY for important emails, -CATEGORY_PROMOTIONS and -CATEGORY_UPDATES to exclude
+    const query = "category:primary -category:promotions -category:updates"
+    const gmailUrl = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100&q=${encodeURIComponent(query)}`
+
+    let gmailResponse = await fetch(gmailUrl, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -54,7 +58,6 @@ export async function POST() {
 
         if (newToken) {
           console.log("[v0] Token refreshed successfully, updating database...")
-          // Update token in database
           const { error: updateError } = await supabase
             .from("profiles")
             .update({ gmail_access_token: newToken })
@@ -66,8 +69,7 @@ export async function POST() {
 
           accessToken = newToken
 
-          // Retry request with new token
-          gmailResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=100", {
+          gmailResponse = await fetch(gmailUrl, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
@@ -94,7 +96,7 @@ export async function POST() {
     }
 
     const gmailData = await gmailResponse.json()
-    console.log("[v0] Fetched", gmailData.messages?.length || 0, "message IDs")
+    console.log("[v0] Fetched", gmailData.messages?.length || 0, "primary message IDs (excluding promotions/updates)")
 
     if (!gmailData.messages || gmailData.messages.length === 0) {
       console.log("[v0] No messages found")
@@ -166,7 +168,7 @@ export async function POST() {
       return NextResponse.json({ error: `Database error: ${upsertError.message}` }, { status: 500 })
     }
 
-    console.log("[v0] Successfully synced", emailsToInsert.length, "emails")
+    console.log("[v0] Successfully synced", emailsToInsert.length, "primary emails")
     return NextResponse.json({ synced: emailsToInsert.length })
   } catch (error) {
     console.error("[v0] Gmail sync error:", error)
