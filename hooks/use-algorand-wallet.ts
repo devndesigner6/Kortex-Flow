@@ -178,82 +178,53 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
   const sendPayment = async (recipient: string, amount: number) => {
     if (!walletAddress || !walletType) {
-      console.error("[v0 WALLET] No wallet connected")
       throw new Error("No wallet connected")
     }
 
     setIsSending(true)
     try {
-      console.log("[v0 WALLET] ===== STARTING PAYMENT =====")
-      console.log("[v0 WALLET] Wallet Type:", walletType)
-      console.log("[v0 WALLET] From:", walletAddress)
-      console.log("[v0 WALLET] To:", recipient)
-      console.log("[v0 WALLET] Amount (ALGO):", amount)
+      console.log("[v0 PAYMENT] Getting balance from wallet hook:", balance)
+      console.log("[v0 PAYMENT MODAL] Setting balance to:", balance)
+      console.log("[v0 PAYMENT] Processing payment with:", { recipient, amount, walletType })
+      console.log("[v0 PAYMENT] Sending to treasury:", recipient)
+      console.log("[v0 PAYMENT] Amount in ALGO:", amount)
       
       const params = await algodClient.getTransactionParams().do()
-      console.log("[v0 WALLET] Got transaction params")
-      
       const amountInMicroAlgos = Math.floor(amount * 1_000_000)
-      console.log("[v0 WALLET] Amount in microAlgos:", amountInMicroAlgos)
       
-      const transaction = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: walletAddress,
         to: recipient,
         amount: amountInMicroAlgos,
         suggestedParams: params,
       })
 
-      console.log("[v0 WALLET] Transaction created successfully")
-      console.log("[v0 WALLET] Transaction from:", transaction.from.toString())
-      console.log("[v0 WALLET] Transaction to:", transaction.to.toString())
+      console.log("[v0 WALLET] Starting payment transaction:", { walletAddress, recipient, amountInMicroAlgos })
+      console.log("[v0 WALLET] Getting balance from wallet hook:", balance)
+      console.log("[v0 PAYMENT MODAL] Setting balance to:", balance)
 
-      let signedTxn: Uint8Array
+      let signedTxns: Uint8Array[]
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        console.log("[v0 WALLET] Signing with Pera...")
-        
-        const singleTxnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        console.log("[v0 WALLET] Transaction group:", singleTxnGroup)
-        
-        const signedTxns = await peraWallet.signTransaction([singleTxnGroup])
-        console.log("[v0 WALLET] Pera returned signed transactions, length:", signedTxns?.length)
-        
-        signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Extracted signed transaction")
+        console.log("[v0] Sending payment:", { recipient, amount })
+        signedTxns = await peraWallet.signTransaction([[{ txn }]])
       } else {
         const deflyWallet = getDeflyWallet()
-        console.log("[v0 WALLET] Signing with Defly...")
-        
-        const singleTxnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        console.log("[v0 WALLET] Transaction group:", singleTxnGroup)
-        
-        const signedTxns = await deflyWallet.signTransaction([singleTxnGroup])
-        console.log("[v0 WALLET] Defly returned signed transactions, length:", signedTxns?.length)
-        
-        signedTxn = signedTxns[0]
-        console.log("[v0 WALLET] Extracted signed transaction")
+        console.log("[v0] Sending payment:", { recipient, amount })
+        signedTxns = await deflyWallet.signTransaction([[{ txn }]])
       }
 
-      console.log("[v0 WALLET] Sending transaction to network...")
-      const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
-      console.log("[v0 WALLET] Transaction sent! ID:", txId)
-
-      console.log("[v0 WALLET] Waiting for confirmation...")
+      console.log("[v0] Sending transaction:", { txId: txn.txID() })
+      const { txId } = await algodClient.sendRawTransaction(signedTxns[0]).do()
+      
       await algosdk.waitForConfirmation(algodClient, txId, 4)
-      console.log("[v0 WALLET] Transaction confirmed!")
-      console.log("[v0 WALLET] ===== PAYMENT COMPLETE =====")
+      console.log("[v0] Payment confirmed:", txId)
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0 WALLET] ===== PAYMENT FAILED =====")
-      console.error("[v0 WALLET] Error:", error)
-      if (error instanceof Error) {
-        console.error("[v0 WALLET] Error name:", error.name)
-        console.error("[v0 WALLET] Error message:", error.message)
-        console.error("[v0 WALLET] Error stack:", error.stack)
-      }
+      console.error("[v0] Error sending payment:", error)
       throw error
     } finally {
       setIsSending(false)
