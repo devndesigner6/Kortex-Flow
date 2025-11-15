@@ -38,25 +38,23 @@ KortexFlow transforms scattered emails and calendar events into organized, AI-ex
 
 ## Quick Start
 
-## Clone the repository:
+Clone the repository:
 
 git clone https://github.com/YOUR_USERNAME/kortexflow.git
 cd kortexflow
 
-## Install dependencies:
+Install dependencies:
 pnpm install
 
-## Open .env.local and fill in:
+Open .env.local and fill in:
 
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_ALGORAND_NETWORK=testnet
 
-## Start the local server:
+Start the local server:
 pnpm dev
 
-
-\`\`\`bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
@@ -205,12 +203,6 @@ When reporting bugs, include:
 - Steps to reproduce
 - Screenshots
 - TestNet wallet address (never share MainNet)
-
----
-
-## License
-
-MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
