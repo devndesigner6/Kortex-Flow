@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { X, Wallet, AlertCircle, CheckCircle2, Loader2, ExternalLink } from 'lucide-react'
 import { usePayment } from "@/hooks/use-payment"
 import { getNetworkConfig } from "@/lib/algorand/config"
+import { MOCK_PAYMENTS_ENABLED } from "@/lib/algorand/mock-payments"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -66,6 +67,7 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
   if (!isOpen) return null
 
   const explorerUrl = `${getNetworkConfig(network).explorerUrl}/${txId}`
+  const showExplorerLink = txId && !txId.startsWith("MOCK_")
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
@@ -88,6 +90,16 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
               <p className="text-sm text-muted-foreground">{featureName}</p>
             </div>
           </div>
+
+          {MOCK_PAYMENTS_ENABLED && (
+            <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+              <span className="text-2xl">🎭</span>
+              <div className="text-sm text-amber-500">
+                <div className="font-medium">Mock Payment Mode</div>
+                <div className="text-xs text-amber-500/80">Transactions are simulated for testing</div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
             <div className="flex items-center justify-between">
@@ -117,7 +129,7 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
                 <div className="text-sm text-primary">Payment successful!</div>
               </div>
-              {txId && (
+              {showExplorerLink && (
                 <a
                   href={explorerUrl}
                   target="_blank"
@@ -126,6 +138,11 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
                 >
                   View on Explorer <ExternalLink className="h-3 w-3" />
                 </a>
+              )}
+              {txId.startsWith("MOCK_") && (
+                <div className="font-mono text-xs text-primary/60">
+                  Mock TX: {txId}
+                </div>
               )}
             </div>
           )}
@@ -155,9 +172,11 @@ export function PaymentModal({ isOpen, onClose, featureName, amount, onSuccess }
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            {network === "testnet"
-              ? "⚠️ TestNet - Not real money. Get free ALGO from faucet."
-              : "⚡ MainNet - Real transactions on Algorand blockchain."}
+            {MOCK_PAYMENTS_ENABLED
+              ? "🎭 Mock Mode - Payments are simulated for testing"
+              : network === "testnet"
+                ? "⚠️ TestNet - Not real money. Get free ALGO from faucet."
+                : "⚡ MainNet - Real transactions on Algorand blockchain."}
           </p>
         </div>
       </div>
