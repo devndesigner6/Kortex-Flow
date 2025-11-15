@@ -214,7 +214,11 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
+      const txnGroup = [txn]
+      algosdk.assignGroupID(txnGroup)
+
       console.log("[v0 PAYMENT] Transaction created with ID:", txn.txID())
+      console.log("[v0 PAYMENT] Transaction group assigned")
 
       let signedTxn: Uint8Array
 
@@ -222,15 +226,18 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         const peraWallet = getPeraWallet()
         
         console.log("[v0 PAYMENT] Signing with Pera wallet...")
+        const txnsToSign = [{ txn: txnGroup[0], signers: [walletAddress] }]
+        console.log("[v0 PAYMENT] Transaction format:", txnsToSign)
         
-        const signedTxns = await peraWallet.signTransaction([[{ txn }]])
+        const signedTxns = await peraWallet.signTransaction([txnsToSign])
         console.log("[v0 PAYMENT] Pera returned signed transactions:", signedTxns)
         signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 PAYMENT] Signing with Defly wallet...")
         
-        const signedTxns = await deflyWallet.signTransaction([[{ txn }]])
+        const txnsToSign = [{ txn: txnGroup[0], signers: [walletAddress] }]
+        const signedTxns = await deflyWallet.signTransaction([txnsToSign])
         signedTxn = signedTxns[0]
       }
 
