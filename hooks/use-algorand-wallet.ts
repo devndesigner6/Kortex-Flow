@@ -206,28 +206,20 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
         
-        console.log("[v0 PAYMENT DEBUG] Pera wallet instance:", peraWallet)
-        console.log("[v0 PAYMENT DEBUG] Pera wallet connector:", peraWallet.connector)
-        
-        if (peraWallet.connector) {
-          console.log("[v0 PAYMENT DEBUG] Pera connector accounts:", peraWallet.connector.accounts)
-          console.log("[v0 PAYMENT DEBUG] Pera connector connected:", peraWallet.connector.connected)
-        }
-        
         console.log("[v0 PAYMENT] Signing with Pera wallet...")
         
-        const txnGroup = [[{ txn, signers: [walletAddress] }]]
+        const txnGroup = [{ txn, signers: [walletAddress] }]
         console.log("[v0 PAYMENT] Transaction group to sign:", txnGroup)
         
-        const signedTxns = await peraWallet.signTransaction(txnGroup)
+        const signedTxns = await peraWallet.signTransaction([txnGroup])
         console.log("[v0 PAYMENT] Pera returned signed transactions:", signedTxns)
         signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 PAYMENT] Signing with Defly wallet...")
         
-        const txnGroup = [[{ txn, signers: [walletAddress] }]]
-        const signedTxns = await deflyWallet.signTransaction(txnGroup)
+        const txnGroup = [{ txn, signers: [walletAddress] }]
+        const signedTxns = await deflyWallet.signTransaction([txnGroup])
         signedTxn = signedTxns[0]
       }
 
