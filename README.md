@@ -38,21 +38,23 @@ KortexFlow transforms scattered emails and calendar events into organized, AI-ex
 
 ## Quick Start
 
-### 1. Clone & Install
+## Clone the repository:
 
-\`\`\`bash
-git clone https://github.com/devndesigner6/Kortex-Flow.git
-cd Kortex-Flow
+git clone https://github.com/YOUR_USERNAME/kortexflow.git
+cd kortexflow
+
+## Install dependencies:
 pnpm install
-\`\`\`
 
-### 2. Configure Environment
+## Open .env.local and fill in:
 
-\`\`\`bash
-cp .env.example .env.local
-\`\`\`
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_ALGORAND_NETWORK=testnet
 
-Add your credentials to `.env.local`:
+## Start the local server:
+pnpm dev
+
 
 \`\`\`bash
 # Supabase
