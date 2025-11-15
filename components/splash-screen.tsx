@@ -1,26 +1,38 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
+import { usePathname } from 'next/navigation'
 
 export function SplashScreen() {
   const [isComplete, setIsComplete] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [shouldShow, setShouldShow] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const pathname = usePathname()
 
   useEffect(() => {
     setIsMounted(true)
-  }, [])
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash')
+    const isHomePage = pathname === '/'
+    
+    if (isHomePage && !hasSeenSplash) {
+      setShouldShow(true)
+      sessionStorage.setItem('hasSeenSplash', 'true')
+    }
+  }, [pathname])
 
   useEffect(() => {
+    if (!shouldShow) return
+
     const timer = setTimeout(() => {
       setIsComplete(true)
     }, 3000)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [shouldShow])
 
   useEffect(() => {
-    if (!isMounted) return
+    if (!isMounted || !shouldShow) return
     
     const canvas = canvasRef.current
     if (!canvas) return
@@ -36,30 +48,40 @@ export function SplashScreen() {
     let animationFrame: number
     let progress = 0
     let morphProgress = 0
-    const morphStartTime = 2000
+    const morphStartTime = 1800
 
     let startTime = Date.now()
 
-    const finalSize = window.innerWidth < 640 ? 120 : 150
+    const isSmallScreen = window.innerWidth < 640
+    const finalSize = isSmallScreen ? 120 : 150
     const finalCenterX = window.innerWidth / 2
-    const finalCenterY = Math.min(window.innerHeight * 0.25, 200)
+    const finalCenterY = isSmallScreen ? 90 : 105
+
+    const elegantEase = (t: number) => {
+      return t < 0.5 
+        ? 2 * t * t * t 
+        : 1 - Math.pow(-2 * t + 2, 3) / 2
+    }
 
     const draw = () => {
       const elapsed = Date.now() - startTime
 
       if (elapsed > morphStartTime) {
-        morphProgress = Math.min((elapsed - morphStartTime) / 1000, 1)
+        morphProgress = Math.min((elapsed - morphStartTime) / 1200, 1)
       }
+
+      const easedMorph = elegantEase(morphProgress)
 
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
       const initialSize = Math.min(window.innerWidth, window.innerHeight) * 0.35
-      const currentSize = initialSize + (finalSize - initialSize) * morphProgress
+      const currentSize = initialSize + (finalSize - initialSize) * easedMorph
 
       const initialCenterX = window.innerWidth / 2
       const initialCenterY = window.innerHeight / 2
-      const centerX = initialCenterX + (finalCenterX - initialCenterX) * morphProgress
-      const centerY = initialCenterY + (finalCenterY - initialCenterY) * morphProgress
+      
+      const centerX = initialCenterX + (finalCenterX - initialCenterX) * easedMorph
+      const centerY = initialCenterY + (finalCenterY - initialCenterY) * easedMorph
 
       const loopWidth = currentSize * 0.7
       const loopHeight = currentSize * 0.35
@@ -70,13 +92,15 @@ export function SplashScreen() {
         return { x, y }
       }
 
-      // Draw infinity loop
+      const subtleGlow = 0.6 + Math.sin(progress * Math.PI * 2) * 0.2
+
+      // Draw infinity loop with refined styling
       ctx.strokeStyle = "rgb(34, 197, 94)"
-      ctx.lineWidth = 3 * (currentSize / finalSize)
+      ctx.lineWidth = 2.5 * (currentSize / finalSize)
       ctx.lineCap = "round"
       ctx.lineJoin = "round"
-      ctx.shadowBlur = 15 * (currentSize / finalSize)
-      ctx.shadowColor = "rgba(34, 197, 94, 0.5)"
+      ctx.shadowBlur = 12 * (currentSize / finalSize)
+      ctx.shadowColor = `rgba(34, 197, 94, ${0.4 * subtleGlow})`
 
       ctx.beginPath()
       for (let t = 0; t <= Math.PI * 2; t += 0.02) {
@@ -86,13 +110,12 @@ export function SplashScreen() {
       }
       ctx.stroke()
 
-      // Draw particle
       const t = progress * Math.PI * 2
       const particlePos = getInfinityPoint(t)
 
-      // Outer glow
-      const glowSize = 25 * (currentSize / finalSize)
-      for (let i = 3; i > 0; i--) {
+      // Refined outer glow
+      const glowSize = 20 * (currentSize / finalSize)
+      for (let i = 2; i > 0; i--) {
         const gradient = ctx.createRadialGradient(
           particlePos.x,
           particlePos.y,
@@ -101,8 +124,7 @@ export function SplashScreen() {
           particlePos.y,
           glowSize * i
         )
-        gradient.addColorStop(0, `rgba(0, 255, 65, ${0.3 / i})`)
-        gradient.addColorStop(0.5, `rgba(34, 197, 94, ${0.2 / i})`)
+        gradient.addColorStop(0, `rgba(34, 197, 94, ${0.3 / i})`)
         gradient.addColorStop(1, "transparent")
         ctx.fillStyle = gradient
         ctx.beginPath()
@@ -110,8 +132,8 @@ export function SplashScreen() {
         ctx.fill()
       }
 
-      // Bright center
-      const particleSize = 8 * (currentSize / finalSize)
+      // Elegant particle core
+      const particleSize = 7 * (currentSize / finalSize)
       const innerGradient = ctx.createRadialGradient(
         particlePos.x,
         particlePos.y,
@@ -121,23 +143,23 @@ export function SplashScreen() {
         particleSize
       )
       innerGradient.addColorStop(0, "rgb(255, 255, 255)")
-      innerGradient.addColorStop(0.5, "rgb(0, 255, 65)")
-      innerGradient.addColorStop(1, "rgba(34, 197, 94, 0.5)")
+      innerGradient.addColorStop(0.5, "rgb(34, 197, 94)")
+      innerGradient.addColorStop(1, "rgba(34, 197, 94, 0.3)")
       ctx.fillStyle = innerGradient
-      ctx.shadowBlur = 20
-      ctx.shadowColor = "#00ff41"
+      ctx.shadowBlur = 15
+      ctx.shadowColor = "rgba(34, 197, 94, 0.6)"
       ctx.beginPath()
       ctx.arc(particlePos.x, particlePos.y, particleSize, 0, Math.PI * 2)
       ctx.fill()
 
-      // Core
+      // Bright center
       ctx.fillStyle = "rgb(255, 255, 255)"
-      ctx.shadowBlur = 10
+      ctx.shadowBlur = 8
       ctx.beginPath()
-      ctx.arc(particlePos.x, particlePos.y, particleSize * 0.4, 0, Math.PI * 2)
+      ctx.arc(particlePos.x, particlePos.y, particleSize * 0.35, 0, Math.PI * 2)
       ctx.fill()
 
-      progress += 0.01
+      progress += 0.008
       if (progress > 1) progress = 0
 
       animationFrame = requestAnimationFrame(draw)
@@ -148,9 +170,9 @@ export function SplashScreen() {
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame)
     }
-  }, [isMounted])
+  }, [isMounted, shouldShow])
 
-  if (isComplete || !isMounted) return null
+  if (isComplete || !isMounted || !shouldShow) return null
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50">

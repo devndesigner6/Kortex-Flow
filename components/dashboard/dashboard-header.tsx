@@ -2,10 +2,10 @@
 
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import type { User } from "@supabase/supabase-js"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { LogOut } from "lucide-react"
+import { LogOut, Mail } from 'lucide-react'
 import { useEffect, useState } from "react"
 import { KortexFlowLogo } from "@/components/kortexflow-logo"
 
@@ -62,6 +62,13 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
         >
           <LogOut className="h-4 w-4 text-red-500 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Button>
+      </div>
+      
+      <div className="flex items-center justify-center gap-2 border-t border-primary/10 pt-3 sm:justify-end">
+        <Mail className="h-3.5 w-3.5 text-primary/70 sm:h-4 sm:w-4" />
+        <p className="font-mono text-xs text-muted-foreground sm:text-sm">
+          Support: <a href="mailto:kortexflowsync@gmail.com" className="text-primary hover:underline">kortexflowsync@gmail.com</a>
+        </p>
       </div>
     </div>
   )

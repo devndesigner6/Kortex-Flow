@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Linkedin, Brain, Shield } from "lucide-react"
+import { ArrowLeft, Linkedin, Brain, Shield, Mail } from 'lucide-react'
 
 export default function AboutPage() {
   const team = [
@@ -127,6 +127,25 @@ export default function AboutPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-8">
+          <div className="rounded-lg border border-primary/20 bg-card/50 p-8 text-center backdrop-blur-sm">
+            <div className="mb-4 flex items-center justify-center gap-3">
+              <Mail className="h-6 w-6 text-primary" />
+              <h2 className="font-mono text-2xl font-bold text-primary">Support & Queries</h2>
+            </div>
+            <p className="mb-4 font-serif text-lg text-foreground">
+              Have questions or need assistance? Reach out to our team.
+            </p>
+            <a
+              href="mailto:kortexflowsync@gmail.com"
+              className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-6 py-3 font-mono text-primary transition-all hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+            >
+              <Mail className="h-5 w-5" />
+              kortexflowsync@gmail.com
+            </a>
           </div>
         </section>
       </div>
