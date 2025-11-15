@@ -1,122 +1,388 @@
-```markdown
-# KortexFlow — Workflows You Can Trust
+<div align="center">
 
-Live demo: https://kortexflow.vercel.app/ · Repo: https://github.com/devndesigner6/Kortex-Flow
+# 🔄 KortexFlow
 
-Welcome — this is the short, friendly guide to what KortexFlow is, why it matters, and how to get started quickly. No long lists of keys, no legal pages here — just the essentials, written for people who want to ship work without endless meetings.
+### AI-Powered Workflow Automation Meets Web3 Transparency
 
-A one-line summary
-KortexFlow turns scattered emails and calendar notes into a single, actionable workflow. It surfaces tasks, suggests owners and deadlines, and can anchor important state changes to Algorand so your team has a tamper-evident history when it matters.
+[Live Demo](https://kortexflow.vercel.app/) • [Documentation](#-documentation) • [Smart Contracts](#-blockchain--smart-contracts) • [Report Bug](mailto:kortexflowsync@gmail.com)
 
-Why you might care
-- Stop losing commitments inside long threads.
-- Reduce status meetings by keeping work visible and accountable.
-- Make approvals and sign-offs auditable without extra paperwork.
+</div>
 
-What it does (brief)
-- Reads Gmail and Calendar events to surface action items.
-- Converts natural-language items into structured tasks.
-- Shows a unified task inbox with owners, due dates, and status.
-- Optionally logs important events to Algorand TestNet for transparency.
+---
 
-How it feels to use
-1. Connect your inbox and calendar.
-2. KortexFlow proposes tasks extracted from messages and events.
-3. Review, assign, and set due dates in a simple flow.
-4. Track progress in one place; optionally record finalized approvals on-chain.
+## 🎯 The Problem
 
-Core features
-- Intelligent task extraction and summarization
-- Unified task inbox with statuses and ownership
-- Realtime sync via Supabase
-- Optional Algorand TestNet anchoring for key actions
-- Lightweight, fast UI built with Next.js
+Modern productivity is broken. Your inbox is chaos—deadlines buried in threads, tasks scattered across apps, and no clear way to track what actually gets done.
 
-Architecture (high level)
-- Frontend: Next.js
-- Backend: Supabase (auth, Postgres, realtime)
-- Ledger: Algorand TestNet (optional smart-contract-backed records)
-- Deploy: Frontend on Vercel, backend on Supabase
+**The cost?** Lost time. Missed opportunities. Zero accountability.
 
-High-level flow
-Connectors → AI extracts structured tasks → Tasks saved to Supabase → UI surfaces tasks → Optional Algorand transactions for auditability
+## 💡 The Solution
 
-Quickstart — get the dev app running
-Requirements
-- Node.js 18+
-- pnpm
-- git
-- A Supabase project (for auth & data)
-- Optional: Algorand TestNet account for blockchain features
+**KortexFlow** transforms your digital chaos into verifiable action. An AI assistant that connects Gmail, Calendar, and Algorand blockchain to automate workflows with full transparency.
 
-Start locally
-```bash
+> **Key Difference:** Every task, deadline, and action is recorded on-chain. No hiding. No forgetting. Complete accountability.
+
+---
+
+## ✨ Core Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🤖 AI Intelligence
+- Smart task extraction from emails
+- Automatic deadline detection
+- Context-aware categorization
+- Natural language processing
+
+</td>
+<td width="33%" valign="top">
+
+### 🔗 Blockchain Trust
+- On-chain workflow verification
+- Immutable task records
+- Pera Wallet integration
+- Transparent audit trail
+
+</td>
+<td width="33%" valign="top">
+
+### ⚡ Seamless Integration
+- Gmail auto-sync
+- Google Calendar connection
+- Real-time updates
+- Zero-config setup
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗️ Technical Architecture
+
+\`\`\`mermaid
+graph LR
+    A[User] --> B[Next.js Frontend]
+    B --> C[Supabase Backend]
+    B --> D[AI Processing]
+    B --> E[Algorand Blockchain]
+    C --> F[PostgreSQL]
+    E --> G[Pera Wallet]
+    D --> H[Task Extraction]
+    style E fill:#00D494
+    style B fill:#000000
+    style C fill:#3ECF8E
+\`\`\`
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Frontend** | Next.js 15 + TypeScript | Responsive UI with server-side rendering |
+| **Backend** | Supabase | Authentication, database, real-time subscriptions |
+| **Blockchain** | Algorand TestNet | Transparent workflow verification & payments |
+| **AI Engine** | Custom NLP | Email parsing, task extraction, automation |
+| **Deployment** | Vercel | Edge functions, global CDN |
+
+---
+
+## 🔐 Blockchain & Smart Contracts
+
+> [!IMPORTANT]
+> All blockchain operations run on **Algorand TestNet** for transparency and safety.
+
+### 📍 Contract Locations
+
+\`\`\`bash
+lib/
+└── algorand/
+    ├── config.ts           # Network configuration
+    ├── wallet-client.ts    # Pera/Defly wallet integration
+    ├── payment-handler.ts  # Transaction management
+    └── mock-payments.ts    # Development testing
+\`\`\`
+
+### 🌐 TestNet Deployment
+
+| Component | Network | Explorer Link |
+|-----------|---------|---------------|
+| **Payment System** | Algorand TestNet | [View on AlgoExplorer](https://testnet.algoexplorer.io/) |
+| **Treasury Wallet** | TestNet Address | `HZ57J3K46JIJXILONBBZOHXGBKPXEN2VIYPCISHKRQ2UKWQXDKWNFB3P` |
+| **Network** | TestNet | [AlgoNode API](https://testnet-api.algorand.network) |
+
+### 💰 Test the Payment Flow
+
+1. Get free TestNet ALGO from [TestNet Dispenser](https://bank.testnet.algorand.network/)
+2. Connect your Pera or Defly wallet
+3. Try AI Task Extraction (costs 0.001 ALGO)
+4. Verify transaction on [AlgoExplorer](https://testnet.algoexplorer.io/)
+
+> [!TIP]
+> All payments are processed via smart contracts—no centralized payment processor required!
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+\`\`\`bash
+Node.js ≥ 18
+pnpm (npm install -g pnpm)
+Git
+Supabase account
+Algorand wallet (Pera or Defly)
+\`\`\`
+
+### Installation
+
+\`\`\`bash
+# 1. Clone the repository
 git clone https://github.com/devndesigner6/Kortex-Flow.git
 cd Kortex-Flow
+
+# 2. Install dependencies
 pnpm install
-cp .env.example .env.local   # fill secrets in .env.local (do not commit)
+
+# 3. Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your keys
+\`\`\`
+
+### Environment Configuration
+
+\`\`\`bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Algorand Configuration
+NEXT_PUBLIC_ALGORAND_NETWORK=testnet
+
+# OAuth (Optional)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000/auth/callback
+\`\`\`
+
+### Run Development Server
+
+\`\`\`bash
 pnpm dev
-# open http://localhost:3000
-```
+\`\`\`
 
-Deploy notes
-- Frontend: push to Vercel for automatic preview and production builds.
-- Backend: Supabase handles auth, DB, and storage — configure your project and copy the keys into your deployment secrets.
+Open [http://localhost:3000](http://localhost:3000) 🎉
 
-Smart contracts & testnet
-- Smart contract helpers live under the Algorand-related folder in this repo (look for lib/algorand or packages/algorand).
-- Use Algorand TestNet while iterating — inspect transactions with AlgoExplorer (testnet).
-- Example deploy pattern (project-specific scripts may vary):
-```bash
-pnpm run algorand:deploy --network testnet
-```
+---
 
-Useful commands (quick list)
-- pnpm install — install dependencies
-- pnpm dev — run dev server
-- pnpm build — production build
-- pnpm start — run production build locally
-- pnpm lint — run linters (if configured)
-- pnpm test — run tests (if present)
+## 📦 Deployment
 
-Troubleshooting highlights
-- Port conflict: run dev on a different port:
-  ```bash
-  pnpm dev -- -p 3001
-  ```
-- Missing module after branch switches: remove node_modules and lockfile then reinstall:
-  ```bash
-  rm -rf node_modules pnpm-lock.yaml
-  pnpm install
-  ```
-- OAuth/connectors failing: make sure redirect URIs match exactly between local/deployed app and the OAuth provider.
-- Vercel build problems: ensure all required secrets are set in your project’s environment.
+### Deploy to Vercel
 
-Security & privacy (practical)
-- Avoid logging raw email content to public logs.
-- Keep service keys and provider tokens in server-only environment variables or secret managers.
-- Review consent scopes and retention policies before enabling connectors for production accounts.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/devndesigner6/Kortex-Flow)
 
-Contributing — simple and welcoming
-We appreciate help with any of the following:
-- UX improvements for onboarding and connectors
-- Tests and CI stability
-- Smart-contract audits and test coverage
-- Improving task parsing accuracy and edge-case handling
+**Manual Deployment:**
 
-How to contribute
-1. Fork the repo
-2. Create a descriptive branch for your work
-3. Open a PR with a clear description and screenshots when helpful
+\`\`\`bash
+# 1. Push to GitHub
+git add .
+git commit -m "Initial commit"
+git push origin main
 
-Contact / help
-If you want hands-on help, I can:
-- add a polished .env.example to the repo,
-- draft CONTRIBUTING.md and SECURITY.md templates,
-- or create a PR with the README refresh and optional screenshots.
+# 2. Import on Vercel Dashboard
+# 3. Add environment variables
+# 4. Deploy!
+\`\`\`
 
-If you’d like me to add one of those items now, tell me which and I’ll prepare it.
-```
-***
-** In essence, KortexFlow transforms routine operations into smart, self-executing processes, empowering individuals and organizations to save time, reduce manual effort, and maintain full transparency over automated actions. It not only simplifies task management but also redefines digital productivity through verifiable automation. With its fusion of AI intelligence and blockchain integrity, KortexFlow marks a new era where trust, efficiency, and autonomy coexist seamlessly. By bridging human intent with machine precision, it ensures that every task is executed with reliability and purpose. Ultimately, KortexFlow is not just an automation tool—it’s a step toward a future where technology works for you, not the other way around.**
+> [!NOTE]
+> Remember to add all environment variables in Vercel Settings → Environment Variables
 
+---
+
+## 🛠️ Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install all dependencies |
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Run production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm type-check` | Check TypeScript types |
+
+---
+
+## 🐛 Troubleshooting
+
+<details>
+<summary><b>Port 3000 already in use</b></summary>
+
+\`\`\`bash
+pnpm dev -- -p 3001
+\`\`\`
+</details>
+
+<details>
+<summary><b>Module not found errors</b></summary>
+
+\`\`\`bash
+rm -rf node_modules .next
+pnpm install
+\`\`\`
+</details>
+
+<details>
+<summary><b>Email verification fails</b></summary>
+
+Check Supabase dashboard:
+- Verify redirect URLs are configured
+- Check email templates are enabled
+- Ensure SMTP settings are correct
+</details>
+
+<details>
+<summary><b>Wallet connection issues</b></summary>
+
+- Ensure you're on TestNet
+- Check wallet extension is installed
+- Clear browser cache and reconnect
+- Get test ALGO from dispenser
+</details>
+
+<details>
+<summary><b>Build fails on Vercel</b></summary>
+
+Ensure all environment variables are set:
+- Check Vercel Settings → Environment Variables
+- Verify variable names match exactly
+- Redeploy after adding variables
+</details>
+
+---
+
+## 📊 Project Structure
+
+\`\`\`
+kortexflow/
+├── app/                    # Next.js app router
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── dashboard/         # Dashboard page
+│   └── page.tsx           # Home page
+├── components/            # React components
+│   ├── blockchain/        # Wallet & payment components
+│   ├── dashboard/         # Dashboard components
+│   └── ui/                # Reusable UI components
+├── lib/                   # Core utilities
+│   ├── algorand/          # 🔐 Blockchain integration
+│   ├── supabase/          # Database client
+│   └── types/             # TypeScript types
+├── hooks/                 # Custom React hooks
+├── public/                # Static assets
+└── scripts/               # Database migration scripts
+\`\`\`
+
+---
+
+## 🔬 How It Works
+
+### 1. **Connect Your Accounts**
+Link Gmail and Google Calendar with one click. KortexFlow securely accesses your data via OAuth.
+
+### 2. **AI Extracts Intelligence**
+Advanced NLP scans emails for tasks, deadlines, and meeting context—automatically categorizing by priority.
+
+### 3. **Blockchain Verification**
+Every completed task is recorded on Algorand's blockchain. Immutable. Verifiable. Transparent.
+
+### 4. **Smart Dashboard**
+Clean, minimal interface shows what matters most. No clutter. No distractions.
+
+---
+
+## 🎨 Design Philosophy
+
+KortexFlow embraces a **retro-tech aesthetic** with:
+
+- **Military Green Theme** - Professional yet modern
+- **Minimalist Interface** - Focus on what matters
+- **Smooth Animations** - Elegant transitions
+- **Dark Mode First** - Easy on the eyes
+
+---
+
+## 🔮 Roadmap
+
+- [x] Gmail integration
+- [x] Calendar sync
+- [x] Algorand wallet connection
+- [x] AI task extraction
+- [x] Payment system
+- [ ] Token-based feature access
+- [ ] Multi-language support
+- [ ] Mobile apps (iOS/Android)
+- [ ] API for third-party integrations
+- [ ] Advanced analytics dashboard
+
+---
+
+## 📚 Resources & Documentation
+
+| Resource | Link |
+|----------|------|
+| **Live Demo** | [kortexflow.vercel.app](https://kortexflow.vercel.app/) |
+| **Next.js Docs** | [nextjs.org/docs](https://nextjs.org/docs) |
+| **Algorand Developer** | [developer.algorand.org](https://developer.algorand.org/) |
+| **Supabase Docs** | [supabase.com/docs](https://supabase.com/docs) |
+| **TestNet Dispenser** | [bank.testnet.algorand.network](https://bank.testnet.algorand.network/) |
+| **Pera Wallet** | [perawallet.app](https://perawallet.app/) |
+
+---
+
+## 🤝 Support & Contact
+
+Need help? Have questions? We're here for you.
+
+📧 **Email:** [kortexflowsync@gmail.com](mailto:kortexflowsync@gmail.com?subject=KortexFlow%20Support)
+
+> [!TIP]
+> For bug reports, please include:
+> - Browser and version
+> - Steps to reproduce
+> - Screenshots if applicable
+> - Wallet address (TestNet only)
+
+---
+
+## ⚖️ License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🌟 Why KortexFlow?
+
+Traditional productivity tools hide what they do. KortexFlow puts everything on the blockchain—every task, every deadline, every action is transparent and verifiable.
+
+**This isn't just automation. This is accountability.**
+
+- ✅ **Trust by default** - Blockchain verification
+- ✅ **AI-powered efficiency** - Smart task extraction
+- ✅ **Full transparency** - Public audit trail
+- ✅ **User sovereignty** - You control your data
+
+---
+
+<div align="center">
+
+### Built with 💚 for a more transparent digital future
+
+**KortexFlow** - Where productivity meets accountability
+
+[Get Started](https://kortexflow.vercel.app/) • [View on GitHub](https://github.com/devndesigner6/Kortex-Flow) • [Contact Us](mailto:kortexflowsync@gmail.com)
+
+</div>
