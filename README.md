@@ -122,27 +122,6 @@ lib/algorand/
 | **Pera/Defly** | Algorand wallet integration |
 
 ---
-
-## Project Structure
-
-\`\`\`
-app/
-├── api/                  → Backend endpoints
-├── auth/                 → Authentication flows
-├── dashboard/            → Main app interface
-└── page.tsx              → Landing page
-
-components/
-├── blockchain/          → Wallet & payment UI
-├── dashboard/           → Email, calendar, tasks
-└── ui/                  → Design system
-
-lib/
-├── algorand/           → 🔐 Blockchain integration
-├── supabase/           → Database utilities
-└── types/              → TypeScript definitions
-\`\`\`
-
 ---
 
 ## Deployment
