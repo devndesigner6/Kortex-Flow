@@ -184,12 +184,14 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
 
     setIsSending(true)
     try {
-      console.log("[v0 WALLET] Starting payment transaction")
+      console.log("[v0 WALLET] ===== STARTING PAYMENT =====")
+      console.log("[v0 WALLET] Wallet Type:", walletType)
       console.log("[v0 WALLET] From:", walletAddress)
       console.log("[v0 WALLET] To:", recipient)
       console.log("[v0 WALLET] Amount (ALGO):", amount)
       
       const params = await algodClient.getTransactionParams().do()
+      console.log("[v0 WALLET] Got transaction params")
       
       const amountInMicroAlgos = Math.floor(amount * 1_000_000)
       console.log("[v0 WALLET] Amount in microAlgos:", amountInMicroAlgos)
@@ -201,46 +203,54 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         suggestedParams: params,
       })
 
-      console.log("[v0 WALLET] Transaction created")
+      console.log("[v0 WALLET] Transaction created successfully")
+      console.log("[v0 WALLET] Transaction from:", transaction.from.toString())
+      console.log("[v0 WALLET] Transaction to:", transaction.to.toString())
 
       let signedTxn: Uint8Array
 
       if (walletType === "pera") {
         const peraWallet = getPeraWallet()
-        console.log("[v0 WALLET] Requesting Pera signature")
+        console.log("[v0 WALLET] Signing with Pera...")
         
-        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        const signedTxns = await peraWallet.signTransaction([txnGroup])
+        const singleTxnGroup = [{ txn: transaction, signers: [walletAddress] }]
+        console.log("[v0 WALLET] Transaction group:", singleTxnGroup)
         
-        console.log("[v0 WALLET] Pera signature received, type:", typeof signedTxns)
-        console.log("[v0 WALLET] signedTxns:", signedTxns)
+        const signedTxns = await peraWallet.signTransaction([singleTxnGroup])
+        console.log("[v0 WALLET] Pera returned signed transactions, length:", signedTxns?.length)
         
         signedTxn = signedTxns[0]
+        console.log("[v0 WALLET] Extracted signed transaction")
       } else {
         const deflyWallet = getDeflyWallet()
-        console.log("[v0 WALLET] Requesting Defly signature")
+        console.log("[v0 WALLET] Signing with Defly...")
         
-        const txnGroup = [{ txn: transaction, signers: [walletAddress] }]
-        const signedTxns = await deflyWallet.signTransaction([txnGroup])
+        const singleTxnGroup = [{ txn: transaction, signers: [walletAddress] }]
+        console.log("[v0 WALLET] Transaction group:", singleTxnGroup)
         
-        console.log("[v0 WALLET] Defly signature received")
+        const signedTxns = await deflyWallet.signTransaction([singleTxnGroup])
+        console.log("[v0 WALLET] Defly returned signed transactions, length:", signedTxns?.length)
         
         signedTxn = signedTxns[0]
+        console.log("[v0 WALLET] Extracted signed transaction")
       }
 
-      console.log("[v0 WALLET] Sending to network...")
+      console.log("[v0 WALLET] Sending transaction to network...")
       const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
       console.log("[v0 WALLET] Transaction sent! ID:", txId)
 
       console.log("[v0 WALLET] Waiting for confirmation...")
       await algosdk.waitForConfirmation(algodClient, txId, 4)
       console.log("[v0 WALLET] Transaction confirmed!")
+      console.log("[v0 WALLET] ===== PAYMENT COMPLETE =====")
 
       await refreshBalance()
       return txId
     } catch (error) {
-      console.error("[v0 WALLET] Payment error:", error)
+      console.error("[v0 WALLET] ===== PAYMENT FAILED =====")
+      console.error("[v0 WALLET] Error:", error)
       if (error instanceof Error) {
+        console.error("[v0 WALLET] Error name:", error.name)
         console.error("[v0 WALLET] Error message:", error.message)
         console.error("[v0 WALLET] Error stack:", error.stack)
       }

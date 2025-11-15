@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useRouter } from 'next/navigation'
-import { getPeraWallet } from "@/lib/algorand/wallet-client"
+import { getPeraWallet, getDeflyWallet } from "@/lib/algorand/wallet-client"
 
 interface BlockchainDashboardProps {
   userId: string
@@ -15,12 +15,14 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
   const router = useRouter()
   const [walletConnected, setWalletConnected] = useState(false)
   const [walletAddress, setWalletAddress] = useState<string>("")
+  const [walletType, setWalletType] = useState<"pera" | "defly" | null>(null)
   const [balance, setBalance] = useState<number>(0)
   const [contractAddress] = useState<string>("ALGO_CONTRACT_PLACEHOLDER")
   const [oracleStatus] = useState<"active" | "inactive">("inactive")
   const [isConnecting, setIsConnecting] = useState(false)
   
   const peraWallet = getPeraWallet()
+  const deflyWallet = getDeflyWallet()
 
   useEffect(() => {
     peraWallet
@@ -29,17 +31,34 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
         if (peraWallet.isConnected && accounts.length) {
           console.log("[v0] Reconnected to Pera Wallet:", accounts[0])
           setWalletAddress(accounts[0])
+          setWalletType("pera")
           setWalletConnected(true)
           fetchBalance(accounts[0])
         }
       })
       .catch((error) => {
-        console.log("[v0] No existing session:", error)
+        console.log("[v0] No existing Pera session:", error)
+      })
+
+    deflyWallet
+      .reconnectSession()
+      .then((accounts) => {
+        if (deflyWallet.isConnected && accounts.length) {
+          console.log("[v0] Reconnected to Defly Wallet:", accounts[0])
+          setWalletAddress(accounts[0])
+          setWalletType("defly")
+          setWalletConnected(true)
+          fetchBalance(accounts[0])
+        }
+      })
+      .catch((error) => {
+        console.log("[v0] No existing Defly session:", error)
       })
 
     // Cleanup on unmount
     return () => {
       peraWallet.connector?.off("disconnect", handleDisconnect)
+      deflyWallet.connector?.off("disconnect", handleDisconnect)
     }
   }, [])
 
@@ -60,29 +79,32 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
     console.log("[v0] Wallet disconnected")
     setWalletConnected(false)
     setWalletAddress("")
+    setWalletType(null)
     setBalance(0)
   }
 
-  const connectWallet = async () => {
+  const connectWallet = async (type: "pera" | "defly") => {
     try {
       setIsConnecting(true)
-      console.log("[v0] Connecting to Pera Wallet...")
+      console.log(`[v0] Connecting to ${type} Wallet...`)
 
-      const accounts = await peraWallet.connect()
-      console.log("[v0] Connected accounts:", accounts)
+      const wallet = type === "pera" ? peraWallet : deflyWallet
+      const accounts = await wallet.connect()
+      console.log(`[v0] Connected accounts:`, accounts)
 
       // Set up disconnect listener
-      peraWallet.connector?.on("disconnect", handleDisconnect)
+      wallet.connector?.on("disconnect", handleDisconnect)
 
       setWalletAddress(accounts[0])
+      setWalletType(type)
       setWalletConnected(true)
 
       // Fetch balance for connected account
       await fetchBalance(accounts[0])
     } catch (error: any) {
-      console.error("[v0] Wallet connection failed:", error)
+      console.error(`[v0] ${type} connection failed:`, error)
       if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
-        alert("Failed to connect wallet: " + (error?.message || "Unknown error"))
+        alert(`Failed to connect wallet: ${error?.message || "Unknown error"}`)
       }
     } finally {
       setIsConnecting(false)
@@ -91,7 +113,11 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
 
   const disconnectWallet = () => {
     console.log("[v0] Disconnecting wallet...")
-    peraWallet.disconnect()
+    if (walletType === "pera") {
+      peraWallet.disconnect()
+    } else if (walletType === "defly") {
+      deflyWallet.disconnect()
+    }
     handleDisconnect()
   }
 
@@ -118,24 +144,42 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
         {!walletConnected ? (
           <div className="space-y-4">
             <p className="text-sm text-[#00ff00]/70">
-              Connect your Pera Wallet to interact with the Algorand blockchain
+              Connect your wallet to interact with the Algorand blockchain
             </p>
-            <Button
-              onClick={connectWallet}
-              disabled={isConnecting}
-              className="bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black disabled:opacity-50"
-            >
-              {isConnecting ? "CONNECTING..." : "CONNECT_PERA_WALLET"}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => connectWallet("pera")}
+                disabled={isConnecting}
+                className="bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black disabled:opacity-50"
+              >
+                {isConnecting ? "CONNECTING..." : "CONNECT_PERA"}
+              </Button>
+              <Button
+                onClick={() => connectWallet("defly")}
+                disabled={isConnecting}
+                className="bg-transparent border border-[#00ff00] text-[#00ff00] hover:bg-[#00ff00] hover:text-black disabled:opacity-50"
+              >
+                {isConnecting ? "CONNECTING..." : "CONNECT_DEFLY"}
+              </Button>
+            </div>
             <p className="text-xs text-[#00ff00]/50">
-              Don't have Pera Wallet?{" "}
+              Don't have a wallet?{" "}
               <a
                 href="https://perawallet.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-[#00ff00]"
               >
-                Download here
+                Pera
+              </a>
+              {" | "}
+              <a
+                href="https://defly.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-[#00ff00]"
+              >
+                Defly
               </a>
             </p>
           </div>
@@ -143,7 +187,9 @@ export function BlockchainDashboard({ userId, userEmail }: BlockchainDashboardPr
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs text-[#00ff00]/70">WALLET_ADDRESS:</p>
+                <p className="text-xs text-[#00ff00]/70">WALLET_TYPE:</p>
+                <p className="text-sm font-mono uppercase">{walletType}</p>
+                <p className="text-xs text-[#00ff00]/70 mt-2">WALLET_ADDRESS:</p>
                 <p className="text-sm font-mono break-all">{walletAddress}</p>
               </div>
               <Button
