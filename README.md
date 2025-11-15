@@ -1,73 +1,64 @@
-# KortexFlow: Smart Automation Meets Real Transparency
 
-KortexFlow is your smart assistant for taming digital chaos. It connects Gmail, Calendar, and your Algorand wallet, automatically sorting out tasks and deadlines. You get a clean, easy dashboard—no more missed to-dos, no more hunting for important info buried in email threads. Everything is powered by AI for daily task extraction and all actions are locked with Algorand blockchain so you can *actually* trust what you see.[1][2]
+# KortexFlow – Workflows You Can Trust
 
-**Why use KortexFlow?**  
-Most tools make you trust them with your data. KortexFlow puts you in control. When it grabs your next calendar event or marks a task complete, that proof is stored transparently on a public blockchain. You, and only you, own your history—via your Pera Wallet.
+Are you tired of juggling reminders, deadlines, and workplace tasks across five different apps and losing track of which update happened where? KortexFlow was designed for real teams and individuals who believe digital productivity should be simple, open, and documented—not mysterious or locked away.
 
 ***
 
-## Quick Setup
+## The Idea
 
-- Make sure you have Node.js (version 18 or above), pnpm, Git, a Supabase account, and ideally VS Code.
-- Clone the repo:
+We set out to build a tool where every action is visible and accountable. With KortexFlow, you don’t just get another dashboard; you get easy connections between your inbox, calendar, and wallet, with everything tracked securely on the Algorand blockchain. This means every completed task, deadline met, or change in workflow is written to an open ledger. No hiding—every step is permanent and reviewable.
+
+***
+
+## Installation Quickstart
+
+You only need the basics: Node.js 18+, pnpm, Git, and a Supabase account. Here’s how you get started:
+
+- Clone the repository:
   ```
   git clone https://github.com/YOUR_USERNAME/kortexflow.git
   cd kortexflow
   ```
-- Install all the dependencies with:
+- Install what you need:
   ```
   pnpm install
   ```
-- Set up your local secrets by editing `.env.local` with:
-  ```
-  NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-  NEXT_PUBLIC_ALGORAND_NETWORK=testnet
-  ```
-- Start the local server:
+- Add your config to `.env.local` (Supabase keys and Algorand network info).
+- Run:
   ```
   pnpm dev
   ```
-  Then just visit [http://localhost:3000](http://localhost:3000/) to try it out.[2][1]
+  Open your browser—and your workflow is clear and ready at [http://localhost:3000](http://localhost:3000).
 
-**Deploying publicly?**  
-Push your code to GitHub, hook it up on Vercel, and drop in your environment variables through their dashboard.
-
-***
-
-## Blockchain Transparency
-
-Every action—from creating to ticking off a task—becomes a permanent, verifiable blockchain record (using Algorand TestNet, visible on AlgoExplorer). All interactions are real blockchain transactions, signed through Pera Wallet. The project code for Algorand integration is inside `lib/algorand` in the main folder.[1][2]
+For public launch, push to GitHub and link to Vercel, then add your secrets in the dashboard.
 
 ***
 
-## Tech Under The Hood
+## Blockchain-Backed Actions
 
-- **Frontend**: Next.js and Vite (for a fast, clean interface)
-- **Backend**: Supabase (auth, data)
-- **Blockchain**: Algorand (real immutable records)
-- **AI Layer**: Custom logic that pulls real tasks from messy emails
-- **Deployment**: Vercel (frontend), Supabase (backend)[2][1]
+Why trust a dashboard to tell you what’s done? With KortexFlow, every change is a blockchain transaction—visible on AlgoExplorer and impossible to erase or fake. The smart contract code lives in `lib/algorand`. You can always trace, verify, and audit your own progress from day one.
 
 ***
 
-## See It Live
+## How It’s Built
 
-Want to experience it right away? Visit the latest version:  
-https://v0-decentralized-kortex-flow-app.vercel.app/[1][2]
+KortexFlow uses simple tech to empower users:
+- Next.js and Vite for a fast, reliable dashboard
+- Supabase for secure data management and login
+- Algorand for permanent, transparent tracking of every change
+- Vercel deploys everything with a click
 
-***
-
-## Troubleshooting
-
-- If port 3000 is in use, run: `pnpm dev -- -p 3001`
-- If you hit a missing module, delete `node_modules` then run `pnpm install` again.
-- If Supabase login isn’t working, double-check your `.env.local` values.
-- If Vercel builds fail, make sure your secrets are all set.
+You don’t need to understand blockchain to benefit—but if you do, you’ll appreciate the security.
 
 ***
 
-**KortexFlow is powered by the Block Genesis team. Real productivity, real trust, AI and blockchain finally working for you—not the other way around.**[2][1]
+## Explore the Frontend
 
+See everything live at:  
+[https://kortexflow.vercel.app/](https://kortexflow.vercel.app/)
+
+***
+
+**KortexFlow isn't trying to predict your future—it's here to record your real actions, step by step, and put you back in charge of your work. Reliable, auditable, and always transparent.**
 
