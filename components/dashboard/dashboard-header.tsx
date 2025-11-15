@@ -54,6 +54,16 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
         </div>
       </div>
       <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
+        <Button
+          asChild
+          className="group border border-primary/20 bg-primary/5 p-2 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-[0_0_10px_rgba(var(--primary),0.2)] sm:p-2.5"
+          aria-label="Contact Support"
+        >
+          <a href="mailto:kortexflowsync@gmail.com?subject=KortexFlow Support Query">
+            <Mail className="h-4 w-4 text-primary transition-transform duration-300 group-hover:scale-110" />
+          </a>
+        </Button>
+        
         <ThemeToggle />
         <Button
           onClick={handleLogout}
