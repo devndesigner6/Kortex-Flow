@@ -1,7 +1,3 @@
-<div align="center">
-
-<img src="public/images/kortexflow-logo-email.jpg" alt="KortexFlow" width="200"/>
-
 # KortexFlow
 
 **Where AI meets accountability**
