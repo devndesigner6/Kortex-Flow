@@ -1,0 +1,196 @@
+import algosdk from "algosdk"
+import { PeraWalletConnect } from "@perawallet/connect"
+import { DeflyWalletConnect } from "@blockshake/defly-connect"
+import { getNetworkConfig, TREASURY_WALLET, type AlgorandNetwork } from "./config"
+
+export interface PaymentParams {
+  amount: number // in microAlgos
+  note?: string
+  walletType: "pera" | "defly"
+  network: AlgorandNetwork
+}
+
+export interface PaymentResult {
+  success: boolean
+  txId?: string
+  error?: string
+}
+
+let peraWalletInstance: PeraWalletConnect | null = null
+let deflyWalletInstance: DeflyWalletConnect | null = null
+
+export class AlgorandPaymentHandler {
+  private algodClient: algosdk.Algodv2
+  private network: AlgorandNetwork
+
+  constructor(network: AlgorandNetwork = "testnet") {
+    this.network = network
+    const config = getNetworkConfig(network)
+    this.algodClient = new algosdk.Algodv2(config.nodeToken, config.nodeServer, config.nodePort)
+  }
+
+  private getPeraWallet(): PeraWalletConnect {
+    if (!peraWalletInstance) {
+      peraWalletInstance = new PeraWalletConnect()
+    }
+    return peraWalletInstance
+  }
+
+  private getDeflyWallet(): DeflyWalletConnect {
+    if (!deflyWalletInstance) {
+      deflyWalletInstance = new DeflyWalletConnect()
+    }
+    return deflyWalletInstance
+  }
+
+  async createPaymentTransaction(senderAddress: string, amount: number, note?: string): Promise<Uint8Array> {
+    const suggestedParams = await this.algodClient.getTransactionParams().do()
+    const treasuryAddress = TREASURY_WALLET[this.network]
+
+    const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      sender: senderAddress,
+      receiver: treasuryAddress,
+      amount,
+      note: note ? new TextEncoder().encode(note) : undefined,
+      suggestedParams,
+    })
+
+    return txn.toByte()
+  }
+
+  async sendPayment(params: PaymentParams, senderAddress: string): Promise<PaymentResult> {
+    try {
+      console.log("[v0 PAYMENT] Validating address:", senderAddress)
+
+      if (!senderAddress || senderAddress.trim() === "") {
+        console.error("[v0 PAYMENT] Address validation failed - address is null or empty")
+        return {
+          success: false,
+          error: "Address must not be null or undefined",
+        }
+      }
+
+      console.log("[v0 PAYMENT] Starting payment transaction:", {
+        amount: params.amount,
+        network: this.network,
+        wallet: params.walletType,
+        address: senderAddress,
+      })
+
+      const suggestedParams = await this.algodClient.getTransactionParams().do()
+      const treasuryAddress = TREASURY_WALLET[this.network]
+
+      console.log("[v0 PAYMENT] Creating transaction from", senderAddress, "to", treasuryAddress)
+
+      const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        sender: senderAddress,
+        receiver: treasuryAddress,
+        amount: params.amount,
+        note: params.note ? new TextEncoder().encode(params.note) : undefined,
+        suggestedParams,
+      })
+
+      console.log("[v0 PAYMENT] Transaction object created successfully")
+
+      let signedTxn: Uint8Array
+
+      if (params.walletType === "pera") {
+        console.log("[v0 PAYMENT] Using Pera wallet for signing")
+        const peraWallet = this.getPeraWallet()
+
+        // Reconnect to existing session
+        const accounts = await peraWallet.reconnectSession()
+        console.log("[v0 PAYMENT] Pera wallet accounts:", accounts)
+
+        const singleTxnGroup = [{ txn: txn }]
+        const signedTxnArray = await peraWallet.signTransaction([singleTxnGroup])
+        signedTxn = signedTxnArray[0]
+      } else {
+        console.log("[v0 PAYMENT] Using Defly wallet for signing")
+        const deflyWallet = this.getDeflyWallet()
+
+        // Reconnect to existing session
+        const accounts = await deflyWallet.reconnectSession()
+        console.log("[v0 PAYMENT] Defly wallet accounts:", accounts)
+
+        const singleTxnGroup = [{ txn: txn }]
+        const signedTxnArray = await deflyWallet.signTransaction([singleTxnGroup])
+        signedTxn = signedTxnArray[0]
+      }
+
+      console.log("[v0 PAYMENT] Transaction signed successfully")
+
+      const response = await this.algodClient.sendRawTransaction(signedTxn).do()
+      const txId = response.txid
+
+      console.log("[v0 PAYMENT] Payment transaction sent:", txId)
+
+      // Wait for confirmation
+      await this.waitForConfirmation(txId)
+
+      console.log("[v0 PAYMENT] Payment confirmed:", txId)
+
+      return {
+        success: true,
+        txId,
+      }
+    } catch (error) {
+      console.error("[v0 PAYMENT] Payment failed:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Payment failed",
+      }
+    }
+  }
+
+  async waitForConfirmation(txId: string, timeout = 4): Promise<void> {
+    const startTime = Date.now()
+    let lastRound = (await this.algodClient.status().do()).lastRound
+
+    while (Date.now() - startTime < timeout * 1000) {
+      try {
+        const pendingInfo = await this.algodClient.pendingTransactionInformation(txId).do()
+        if (pendingInfo.confirmedRound !== null && pendingInfo.confirmedRound !== undefined && pendingInfo.confirmedRound > 0) {
+          return
+        }
+      } catch (error) {
+        // Transaction not found yet, continue waiting
+      }
+
+      lastRound = lastRound + BigInt(1)
+      await this.algodClient.statusAfterBlock(lastRound).do()
+    }
+
+    throw new Error("Transaction confirmation timeout")
+  }
+
+  async getBalance(address: string): Promise<number> {
+    try {
+      console.log("[v0 HANDLER] Fetching balance for address:", address, "network:", this.network)
+
+      const response = await fetch(`/api/algorand/balance?address=${address}&network=${this.network}`)
+
+      if (!response.ok) {
+        console.error("[v0 HANDLER] API returned error status:", response.status)
+        const errorData = await response.json()
+        console.error("[v0 HANDLER] Error details:", errorData)
+        return 0
+      }
+
+      const data = await response.json()
+      console.log("[v0 HANDLER] API response:", data)
+
+      // API returns balance in ALGO, convert to microAlgos
+      const balanceInAlgo = data.balance || 0
+      const balanceInMicroAlgos = Math.floor(balanceInAlgo * 1_000_000)
+
+      console.log("[v0 HANDLER] Balance in ALGO:", balanceInAlgo)
+      console.log("[v0 HANDLER] Balance in microAlgos:", balanceInMicroAlgos)
+
+      return balanceInMicroAlgos
+    } catch (error) {
+      console.error("[v0 HANDLER] Failed to fetch balance:", error)
+      return 0
+    }
+  }
+}
