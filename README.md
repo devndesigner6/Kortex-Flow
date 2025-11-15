@@ -38,6 +38,48 @@ KortexFlow transforms scattered emails and calendar events into organized, AI-ex
 
 ---
 
+## Quick Start
+
+### 1. Clone & Install
+
+\`\`\`bash
+git clone https://github.com/devndesigner6/Kortex-Flow.git
+cd Kortex-Flow
+pnpm install
+\`\`\`
+
+### 2. Configure Environment
+
+\`\`\`bash
+cp .env.example .env.local
+\`\`\`
+
+Add your credentials to `.env.local`:
+
+\`\`\`bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_key
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+
+# Algorand
+NEXT_PUBLIC_ALGORAND_NETWORK=testnet
+\`\`\`
+
+### 3. Run Development Server
+
+\`\`\`bash
+pnpm dev
+\`\`\`
+
+Visit [localhost:3000](http://localhost:3000)
+
+---
+
 ## Blockchain Deployment
 
 > **Network:** Algorand TestNet (free test tokens available)
@@ -83,43 +125,6 @@ lib/algorand/
 
 ---
 
-## Quick Start
-
-\`\`\`bash
-# Clone and install
-git clone https://github.com/devndesigner6/Kortex-Flow.git
-cd Kortex-Flow
-pnpm install
-
-# Configure environment
-cp .env.example .env.local
-\`\`\`
-
-Add your credentials to `.env.local`:
-
-\`\`\`bash
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_key
-
-# Google OAuth (optional)
-GOOGLE_CLIENT_ID=your_client_id
-GOOGLE_CLIENT_SECRET=your_client_secret
-
-# Algorand
-NEXT_PUBLIC_ALGORAND_NETWORK=testnet
-\`\`\`
-
-\`\`\`bash
-# Run development server
-pnpm dev
-\`\`\`
-
-Visit [localhost:3000](http://localhost:3000)
-
----
-
 ## Project Structure
 
 \`\`\`
@@ -159,7 +164,7 @@ git push origin main
 
 ---
 
-## Common Issues
+## Troubleshooting
 
 <details>
 <summary><strong>Wallet connection fails</strong></summary>
