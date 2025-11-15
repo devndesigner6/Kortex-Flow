@@ -18,6 +18,7 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
   const router = useRouter()
   const supabase = createClient()
   const [profile, setProfile] = useState(initialProfile)
+  const [isContactHovered, setIsContactHovered] = useState(false)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,11 +57,14 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
       <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
         <Button
           asChild
-          className="group border border-primary/20 bg-primary/5 p-2 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-[0_0_10px_rgba(var(--primary),0.2)] sm:p-2.5"
+          className="group relative border border-primary/20 bg-primary/5 p-2 transition-all duration-300 hover:border-primary/40 hover:bg-primary/10 hover:shadow-[0_0_20px_rgba(var(--primary),0.3)] sm:p-2.5"
           aria-label="Contact Support"
+          onMouseEnter={() => setIsContactHovered(true)}
+          onMouseLeave={() => setIsContactHovered(false)}
         >
           <a href="mailto:kortexflowsync@gmail.com?subject=KortexFlow Support Query">
-            <Mail className="h-4 w-4 text-primary transition-transform duration-300 group-hover:scale-110" />
+            <Mail className={`h-4 w-4 text-primary transition-all duration-500 ${isContactHovered ? 'rotate-[360deg] scale-110' : 'rotate-0 scale-100'}`} />
+            <span className={`absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary transition-all duration-300 ${isContactHovered ? 'scale-150 opacity-100' : 'scale-0 opacity-0'}`} />
           </a>
         </Button>
         
@@ -72,13 +76,6 @@ export function DashboardHeader({ user, profile: initialProfile }: DashboardHead
         >
           <LogOut className="h-4 w-4 text-red-500 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Button>
-      </div>
-      
-      <div className="flex items-center justify-center gap-2 border-t border-primary/10 pt-3 sm:justify-end">
-        <Mail className="h-3.5 w-3.5 text-primary/70 sm:h-4 sm:w-4" />
-        <p className="font-mono text-xs text-muted-foreground sm:text-sm">
-          Support: <a href="mailto:kortexflowsync@gmail.com" className="text-primary hover:underline">kortexflowsync@gmail.com</a>
-        </p>
       </div>
     </div>
   )
