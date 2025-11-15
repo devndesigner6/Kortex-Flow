@@ -189,6 +189,21 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
       console.log("[v0 PAYMENT DEBUG] Recipient:", recipient)
       console.log("[v0 PAYMENT DEBUG] Amount:", amount)
       
+      if (walletType === "pera") {
+        const peraWallet = getPeraWallet()
+        console.log("[v0 PAYMENT] Reconnecting Pera wallet session...")
+        const reconnectedAccounts = await peraWallet.reconnectSession()
+        console.log("[v0 PAYMENT] Reconnected accounts:", reconnectedAccounts)
+        
+        if (!reconnectedAccounts || reconnectedAccounts.length === 0) {
+          throw new Error("Wallet session expired. Please reconnect your wallet.")
+        }
+      } else if (walletType === "defly") {
+        const deflyWallet = getDeflyWallet()
+        console.log("[v0 PAYMENT] Reconnecting Defly wallet session...")
+        await deflyWallet.reconnectSession()
+      }
+      
       const params = await algodClient.getTransactionParams().do()
       const amountInMicroAlgos = Math.floor(amount * 1_000_000)
       
@@ -208,18 +223,14 @@ export function useAlgorandWallet(network: AlgorandNetwork = "testnet") {
         
         console.log("[v0 PAYMENT] Signing with Pera wallet...")
         
-        const txnGroup = [{ txn, signers: [walletAddress] }]
-        console.log("[v0 PAYMENT] Transaction group to sign:", txnGroup)
-        
-        const signedTxns = await peraWallet.signTransaction([txnGroup])
+        const signedTxns = await peraWallet.signTransaction([[{ txn }]])
         console.log("[v0 PAYMENT] Pera returned signed transactions:", signedTxns)
         signedTxn = signedTxns[0]
       } else {
         const deflyWallet = getDeflyWallet()
         console.log("[v0 PAYMENT] Signing with Defly wallet...")
         
-        const txnGroup = [{ txn, signers: [walletAddress] }]
-        const signedTxns = await deflyWallet.signTransaction([txnGroup])
+        const signedTxns = await deflyWallet.signTransaction([[{ txn }]])
         signedTxn = signedTxns[0]
       }
 
