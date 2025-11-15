@@ -4,7 +4,12 @@ import { useEffect, useState, useRef } from "react"
 
 export function SplashScreen() {
   const [isComplete, setIsComplete] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,6 +20,8 @@ export function SplashScreen() {
   }, [])
 
   useEffect(() => {
+    if (!isMounted) return
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -141,9 +148,9 @@ export function SplashScreen() {
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame)
     }
-  }, [])
+  }, [isMounted])
 
-  if (isComplete) return null
+  if (isComplete || !isMounted) return null
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50">

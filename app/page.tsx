@@ -9,7 +9,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-background">
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-4xl text-center">
-          <div className="mb-6 flex justify-center sm:mb-8" style={{ minHeight: window.innerWidth < 640 ? 120 : 150 }}>
+          <div className="mb-6 flex justify-center sm:mb-8" style={{ minHeight: 120 }}>
             <KortexFlowLogo size={120} className="sm:hidden" />
             <KortexFlowLogo size={150} className="hidden sm:block" />
           </div>
