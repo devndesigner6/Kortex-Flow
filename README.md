@@ -1,7 +1,5 @@
 <div align="center">
 
-![KortexFlow](./public/images/kortexflow-logo.svg)
-
 # KortexFlow
 
 **AI-Powered Workflow with Blockchain Accountability**
