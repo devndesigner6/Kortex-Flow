@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Sparkles } from "lucide-react"
+import { ArrowRight, Shield, Sparkles } from 'lucide-react'
 import { KortexFlowLogo } from "@/components/kortexflow-logo"
 import { HomeFooter } from "@/components/home-footer"
 
@@ -9,9 +9,9 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-background">
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-4xl text-center">
-          <div className="mb-6 flex justify-center sm:mb-8">
-            <KortexFlowLogo size={120} className="animate-fade-in sm:hidden" />
-            <KortexFlowLogo size={150} className="hidden animate-fade-in sm:block" />
+          <div className="mb-6 flex justify-center sm:mb-8" style={{ minHeight: window.innerWidth < 640 ? 120 : 150 }}>
+            <KortexFlowLogo size={120} className="sm:hidden" />
+            <KortexFlowLogo size={150} className="hidden sm:block" />
           </div>
 
           <h1 className="mb-4 font-serif text-4xl tracking-wide text-primary sm:mb-6 sm:text-6xl md:text-8xl">

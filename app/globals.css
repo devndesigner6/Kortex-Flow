@@ -148,8 +148,9 @@
 }
 
 @layer utilities {
+  /* Sped up page transitions from 0.25s to 0.15s */
   .page-transition {
-    animation: fadeSlideIn 0.25s ease-out;
+    animation: fadeSlideIn 0.15s ease-out;
   }
 
   @keyframes fadeSlideIn {
@@ -212,8 +213,22 @@
     }
   }
 
+  /* Sped up slide-in animation from 0.25s to 0.15s */
   .animate-slide-in {
-    animation: slideIn 0.25s ease-out;
+    animation: slideIn 0.15s ease-out;
+  }
+
+  /* Added staggered animation delays for splash screen */
+  .animation-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
   }
 
   .animate-glow {
@@ -276,7 +291,59 @@
     z-index: -1;
   }
 
+  /* Added dramatic infinity loop animation keyframes */
+  @keyframes draw-loop {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes loop-particle {
+    0% {
+      offset-distance: 0%;
+      opacity: 0;
+      scale: 0.5;
+    }
+    10% {
+      opacity: 1;
+      scale: 1;
+    }
+    90% {
+      opacity: 1;
+      scale: 1;
+    }
+    100% {
+      offset-distance: 100%;
+      opacity: 0;
+      scale: 0.5;
+    }
+  }
+
+  .animate-draw-loop {
+    animation: draw-loop 1.5s ease-out forwards;
+  }
+
+  .animate-loop-particle {
+    offset-path: path('M 128 128 C 128 64, 64 32, 128 32 C 192 32, 256 96, 256 128 C 256 160, 320 224, 384 224 C 448 224, 384 192, 384 128 C 384 64, 320 32, 256 32 C 192 32, 128 96, 128 128');
+    animation: loop-particle 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: 0.5s;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
   .bg-gradient-radial {
     background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  /* Added fadeBackground keyframe for smooth splash screen transition */
+  @keyframes fadeBackground {
+    0%, 66.6% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 }

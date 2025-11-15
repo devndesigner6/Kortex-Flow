@@ -1,7 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist_Mono, Instrument_Serif, Playfair_Display } from "next/font/google"
+import { Geist_Mono, Instrument_Serif, Playfair_Display } from 'next/font/google'
 import { Analytics } from "@vercel/analytics/next"
+import { SplashScreen } from "@/components/splash-screen"
 import "./globals.css"
 
 const instrumentSerif = Instrument_Serif({
@@ -41,6 +42,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-mono antialiased">
+        <SplashScreen />
         {children}
         <Analytics />
       </body>
