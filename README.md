@@ -40,6 +40,41 @@ For public launch, push to GitHub and link to Vercel, then add your secrets in t
 
 ***
 
+## 🧩 Architecture at a Glance
+
+- *Frontend:* Next.js & Vite for a snappy user experience.
+- *Backend:* Supabase manages authentication and storage.
+- *Blockchain:* Algorand ensures workflow verification and token access.
+- *Deploy:* Use Vercel for frontend and Supabase for backend hosting.
+
+***
+
+## 🔗 Smart Contracts & Testnet
+
+- Core blockchain logic is in KortexFlow Main → lib → algorand.
+- Deploys to the Algorand TestNet for visibility and safety.
+- Easily audit your transactions with AlgoExplorer.
+
+***
+
+## ✅ Useful Commands
+
+- pnpm install — install packages
+- pnpm dev — run the local server
+- pnpm build — build for production
+- pnpm start — serve the production build
+
+***
+
+## 🧩 Troubleshooting
+
+- *Port 3000 issue?* Run pnpm dev -- -p 3001
+- *Missing module?* Delete node_modules and re-install.
+- *Email verification failing?* Double-check Supabase URL and redirect settings.
+- *Build error on Vercel?* Ensure all environment variables are present.
+
+***
+
 ## Blockchain-Backed Actions
 
 Why trust a dashboard to tell you what’s done? With KortexFlow, every change is a blockchain transaction—visible on AlgoExplorer and impossible to erase or fake. The smart contract code lives in `lib/algorand`. You can always trace, verify, and audit your own progress from day one.
