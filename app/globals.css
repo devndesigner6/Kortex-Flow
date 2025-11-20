@@ -1,0 +1,350 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Updated light mode with cleaner, more professional color scheme */
+:root {
+  /* Clean white/light gray backgrounds */
+  --background: oklch(0.99 0.002 240);
+  --foreground: oklch(0.2 0.015 240);
+
+  /* Subtle gray cards with slight warmth */
+  --card: oklch(0.98 0.005 240);
+  --card-foreground: oklch(0.22 0.015 240);
+
+  --popover: oklch(0.99 0.002 240);
+  --popover-foreground: oklch(0.2 0.015 240);
+
+  /* Professional teal/cyan primary for tech aesthetic */
+  --primary: oklch(0.5 0.14 190);
+  --primary-foreground: oklch(0.99 0.002 240);
+
+  /* Soft gray-blue secondary */
+  --secondary: oklch(0.94 0.015 240);
+  --secondary-foreground: oklch(0.28 0.02 240);
+
+  /* Muted cool gray tones */
+  --muted: oklch(0.95 0.01 240);
+  --muted-foreground: oklch(0.5 0.02 240);
+
+  /* Subtle blue-tinted accent */
+  --accent: oklch(0.96 0.02 220);
+  --accent-foreground: oklch(0.28 0.025 220);
+
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.99 0.002 240);
+
+  /* Light gray borders */
+  --border: oklch(0.9 0.01 240);
+  --input: oklch(0.92 0.01 240);
+
+  /* Teal ring for focus states */
+  --ring: oklch(0.55 0.12 190);
+
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+
+  /* Sidebar with clean light aesthetic */
+  --sidebar: oklch(0.98 0.005 240);
+  --sidebar-foreground: oklch(0.25 0.02 240);
+  --sidebar-primary: oklch(0.48 0.13 190);
+  --sidebar-primary-foreground: oklch(0.98 0.005 240);
+  --sidebar-accent: oklch(0.96 0.01 240);
+  --sidebar-accent-foreground: oklch(0.3 0.025 240);
+  --sidebar-border: oklch(0.92 0.01 240);
+  --sidebar-ring: oklch(0.6 0.1 190);
+}
+
+/* Enhanced dark mode with terminal aesthetic */
+.dark {
+  --background: oklch(0.08 0.005 140);
+  --foreground: oklch(0.75 0.15 140);
+  --card: oklch(0.1 0.005 140);
+  --card-foreground: oklch(0.75 0.15 140);
+  --popover: oklch(0.1 0.005 140);
+  --popover-foreground: oklch(0.75 0.15 140);
+  --primary: oklch(0.7 0.18 140);
+  --primary-foreground: oklch(0.08 0.005 140);
+  --secondary: oklch(0.15 0.01 140);
+  --secondary-foreground: oklch(0.7 0.18 140);
+  --muted: oklch(0.15 0.01 140);
+  --muted-foreground: oklch(0.5 0.1 140);
+  --accent: oklch(0.15 0.01 140);
+  --accent-foreground: oklch(0.7 0.18 140);
+  --destructive: oklch(0.5 0.2 20);
+  --destructive-foreground: oklch(0.9 0.15 140);
+  --border: oklch(0.2 0.05 140);
+  --input: oklch(0.2 0.05 140);
+  --ring: oklch(0.6 0.15 140);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+/* Only define fonts in @theme inline - no var() references allowed in Tailwind v4 */
+@theme inline {
+  --font-serif: "Instrument Serif", "Instrument Serif Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-150;
+  }
+}
+
+@layer utilities {
+  /* Sped up page transitions from 0.15s to 0.1s with smooth easing */
+  .page-transition {
+    animation: fadeSlideIn 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Faster fade-in with aesthetic easing */
+  .animate-fade-in {
+    animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s ease-in-out;
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
+    }
+  }
+
+  /* Faster slide-in with aesthetic easing */
+  .animate-slide-in {
+    animation: slideIn 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Added staggered animation delays for splash screen */
+  .animation-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animate-glow {
+    animation: glow 1.5s ease-in-out infinite;
+  }
+
+  .glow-button {
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glow-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3), 0 15px 35px rgba(0, 0, 0, 0.3);
+  }
+
+  .glow-button:active {
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+
+  @keyframes orbPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+
+  .orb-effect {
+    position: relative;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0) 70%);
+    animation: orbPulse 3s ease-in-out infinite;
+  }
+
+  .orb-effect::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(45deg, rgba(34, 197, 94, 0.5), transparent, rgba(34, 197, 94, 0.5));
+    filter: blur(15px);
+    z-index: -1;
+  }
+
+  /* Added dramatic infinity loop animation keyframes */
+  @keyframes draw-loop {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes loop-particle {
+    0% {
+      offset-distance: 0%;
+      opacity: 0;
+      scale: 0.5;
+    }
+    10% {
+      opacity: 1;
+      scale: 1;
+    }
+    90% {
+      opacity: 1;
+      scale: 1;
+    }
+    100% {
+      offset-distance: 100%;
+      opacity: 0;
+      scale: 0.5;
+    }
+  }
+
+  .animate-draw-loop {
+    animation: draw-loop 1.5s ease-out forwards;
+  }
+
+  .animate-loop-particle {
+    offset-path: path('M 128 128 C 128 64, 64 32, 128 32 C 192 32, 256 96, 256 128 C 256 160, 320 224, 384 224 C 448 224, 384 192, 384 128 C 384 64, 320 32, 256 32 C 192 32, 128 96, 128 128');
+    animation: loop-particle 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: 0.5s;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  /* Added fadeBackground keyframe for smooth splash screen transition */
+  @keyframes fadeBackground {
+    0%, 66.6% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
