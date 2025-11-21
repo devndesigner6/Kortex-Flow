@@ -10,8 +10,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  // Use the actual request origin for dynamic URL
-  const appUrl = request.nextUrl.origin
+  // Use environment variable or request origin (but not 0.0.0.0)
+  const origin = request.nextUrl.origin
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || (origin.includes('0.0.0.0') ? 'https://kortexflow-1098890500978.us-central1.run.app' : origin)
   const redirectUri = `${appUrl}/api/calendar/callback`
 
   console.log("[v0] Calendar OAuth - App URL:", appUrl)
