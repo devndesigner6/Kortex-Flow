@@ -1,6 +1,6 @@
 "use client"
 
-import { auth, db } from "./config"
+import { getFirebaseAuth, getFirebaseDb } from "./config"
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -24,9 +24,11 @@ import {
   Timestamp,
 } from "firebase/firestore"
 
+// Use getters to ensure Firebase is initialized
+export const auth = getFirebaseAuth()
+export const db = getFirebaseDb()
+
 export {
-  auth,
-  db,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
