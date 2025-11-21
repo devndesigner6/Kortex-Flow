@@ -4,10 +4,12 @@
 
 **AI-Powered Workflow Automation**
 
-[Launch App](https://kortexflow.vercel.app/) • [Support](mailto:kortexflowsync@gmail.com)
+[Launch App](https://kortexflow-1098890500978.us-central1.run.app/) • [Support](mailto:kortexflowsync@gmail.com)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-Powered-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
+[![Google Cloud](https://img.shields.io/badge/Google_Cloud-Deployed-4285F4?style=flat-square&logo=google-cloud)](https://cloud.google.com/)
+[![Gemini AI](https://img.shields.io/badge/Gemini_AI-Enabled-8E75B2?style=flat-square&logo=google)](https://ai.google.dev/)
 
 </div>
 
@@ -54,14 +56,28 @@ cp .env.example .env.local
 Add your credentials to `.env.local`:
 
 \`\`\`bash
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_key
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-# Google OAuth (optional)
+# Firebase Admin (for server-side)
+FIREBASE_ADMIN_PROJECT_ID=your_project_id
+FIREBASE_ADMIN_CLIENT_EMAIL=your_service_account_email
+FIREBASE_ADMIN_PRIVATE_KEY=your_private_key
+
+# Google OAuth
 GOOGLE_CLIENT_ID=your_client_id
 GOOGLE_CLIENT_SECRET=your_client_secret
+
+# Google Gemini AI
+GOOGLE_AI_API_KEY=your_gemini_api_key
+
+# App URL (for OAuth callbacks)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 \`\`\`
 
 ### 3. Run Development Server
@@ -78,49 +94,80 @@ Visit [localhost:3000](http://localhost:3000)
 
 | Technology | Purpose |
 |------------|---------|
-| **Next.js 15** | React framework with server-side rendering |
-| **TypeScript** | Type-safe development |
-| **Firebase** | Firestore NoSQL database with real-time updates |
-| **TailwindCSS** | Utility-first styling |
-| **Google Gemini AI** | AI-powered task extraction and response generation |
+| **Next.js 16** | React framework with Turbopack and App Router |
+| **TypeScript 5** | Type-safe development |
+| **Firebase** | Authentication and Firestore NoSQL database |
+| **Google Cloud Run** | Containerized serverless deployment |
+| **Google Gemini AI** | gemini-1.5-flash for task extraction and email analysis |
+| **TailwindCSS 4** | Utility-first styling with @tailwindcss/postcss |
+| **Gmail API** | Email sync and management |
+| **Google Calendar API** | Event sync and task conversion |
 
----
 ---
 
 ## Deployment
 
-### Deploy to Vercel
+### Deploy to Google Cloud Run
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/devndesigner6/Kortex-Flow)
-
-Or manually:
-
+1. **Build Docker Image:**
 \`\`\`bash
-git push origin main
-# Then import to Vercel and add environment variables
+gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/kortexflow
 \`\`\`
 
-> Update `NEXT_PUBLIC_APP_URL` to your Vercel domain
+2. **Deploy to Cloud Run:**
+\`\`\`bash
+gcloud run deploy kortexflow \
+  --image gcr.io/YOUR_PROJECT_ID/kortexflow:latest \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 3000
+\`\`\`
+
+3. **Set Environment Variables:**
+\`\`\`bash
+gcloud run services update kortexflow --region us-central1 \
+  --update-env-vars "NEXT_PUBLIC_FIREBASE_API_KEY=your_key,GOOGLE_CLIENT_ID=your_id,..."
+\`\`\`
+
+4. **Configure OAuth Redirect URIs:**
+- Add `https://YOUR_CLOUD_RUN_URL/api/gmail/callback` to Google Cloud Console
+- Add `https://YOUR_CLOUD_RUN_URL/api/calendar/callback` to Google Cloud Console
+
+> **Live Deployment:** [kortexflow-1098890500978.us-central1.run.app](https://kortexflow-1098890500978.us-central1.run.app/)
 
 ---
 
 ## Troubleshooting
 
 <details>
-<summary><strong>Email sync not working</strong></summary>
+<summary><strong>Gmail OAuth not working</strong></summary>
 
-Check Firebase console:
-- Authentication → URL Configuration (add redirect URLs)
-- Authentication → Providers (verify Google OAuth)
+Check Google Cloud Console:
+- APIs & Services → Credentials → OAuth 2.0 Client IDs
+- Add authorized redirect URIs: `https://YOUR_DOMAIN/api/gmail/callback`
+- Ensure OAuth consent screen is published (In Production)
+- Verify `NEXT_PUBLIC_APP_URL` environment variable is set correctly
 
 </details>
 
 <details>
-<summary><strong>Build fails on deployment</strong></summary>
+<summary><strong>Firebase initialization errors</strong></summary>
 
-- Verify all environment variables are set
-- Check for typos (case-sensitive)
-- Redeploy after adding missing variables
+- Ensure all Firebase environment variables are set in Cloud Run
+- Check Firebase Admin private key is properly escaped
+- Verify project ID matches across Firebase and environment variables
+- Check Firestore database is created and rules are configured
+
+</details>
+
+<details>
+<summary><strong>Cloud Run deployment fails</strong></summary>
+
+- Verify Docker build completes successfully
+- Check all required environment variables are set
+- Ensure container registry permissions are correct
+- Review Cloud Run logs: `gcloud run services logs read kortexflow --region us-central1`
 
 </details>
 
@@ -128,11 +175,15 @@ Check Firebase console:
 
 ## Roadmap
 
-- [ ] Token economy for task completion rewards
-- [ ] Team workspaces with shared accountability
+- [x] Google Cloud Run deployment
+- [x] Firebase Authentication & Firestore
+- [x] Google Gemini AI integration
+- [x] Gmail & Calendar OAuth sync
+- [ ] Advanced AI task prioritization
+- [ ] Team workspaces with shared tasks
 - [ ] Native mobile apps (iOS/Android)
-- [ ] Public API for third-party integrations
-- [ ] Advanced productivity analytics
+- [ ] Slack/Microsoft Teams integration
+- [ ] Advanced productivity analytics dashboard
 
 ---
 
@@ -140,9 +191,11 @@ Check Firebase console:
 
 | Resource | Link |
 |----------|------|
-| **Live App** | [kortexflow.vercel.app](https://kortexflow.vercel.app/) |
+| **Live App** | [kortexflow-1098890500978.us-central1.run.app](https://kortexflow-1098890500978.us-central1.run.app/) |
 | **GitHub** | [github.com/devndesigner6/Kortex-Flow](https://github.com/devndesigner6/Kortex-Flow) |
 | **Support Email** | [kortexflowsync@gmail.com](mailto:kortexflowsync@gmail.com) |
+| **Google Cloud Console** | [console.cloud.google.com](https://console.cloud.google.com/) |
+| **Firebase Console** | [console.firebase.google.com](https://console.firebase.google.com/) |
 
 ---
 
@@ -170,6 +223,8 @@ MIT License - See [LICENSE](LICENSE) for details
 
 Every task organized. Every deadline tracked. Every action simplified.
 
-**[Launch KortexFlow →](https://kortexflow.vercel.app/)**
+**Powered by Google Cloud Run • Firebase • Gemini AI**
+
+**[Launch KortexFlow →](https://kortexflow-1098890500978.us-central1.run.app/)**
 
 </div>
