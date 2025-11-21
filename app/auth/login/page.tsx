@@ -1,10 +1,6 @@
 "use client"
 
-export const dynamic = 'force-dynamic'
-
 import type React from "react"
-
-import { getAuth, signInWithEmailAndPassword } from "@/lib/firebase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,6 +9,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { ArrowRight, Key, Brain } from "lucide-react"
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -35,6 +34,8 @@ export default function LoginPage() {
     try {
       console.log("[v0] Starting login for:", email)
 
+      // Lazy import Firebase to avoid build-time initialization
+      const { getAuth, signInWithEmailAndPassword } = await import("@/lib/firebase/client")
       const auth = getAuth()
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       const user = userCredential.user

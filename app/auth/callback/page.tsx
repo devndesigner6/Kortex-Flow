@@ -1,12 +1,11 @@
 "use client"
 
-export const dynamic = 'force-dynamic'
-export const fetchCache = 'force-no-store'
-
-import { getAuth } from "@/lib/firebase/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
@@ -19,7 +18,8 @@ export default function AuthCallbackPage() {
         // Only run in browser
         if (typeof window === "undefined") return
 
-        // Get Firebase Auth instance
+        // Lazy import Firebase to avoid build-time initialization
+        const { getAuth } = await import("@/lib/firebase/client")
         const auth = getAuth()
         
         // Firebase handles auth automatically via redirect
