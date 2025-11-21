@@ -4,12 +4,12 @@ import { getFirestore, Firestore } from "firebase/firestore"
 import { getAnalytics, isSupported } from "firebase/analytics"
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
@@ -19,10 +19,15 @@ let auth: Auth | null = null
 let db: Firestore | null = null
 
 function initializeFirebase() {
-  if (!app && firebaseConfig.apiKey && typeof window !== "undefined") {
-    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
-    auth = getAuth(app)
-    db = getFirestore(app)
+  // Only initialize if we have valid config and we're in the browser
+  if (!app && firebaseConfig.apiKey && firebaseConfig.projectId && typeof window !== "undefined") {
+    try {
+      app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
+      auth = getAuth(app)
+      db = getFirestore(app)
+    } catch (error) {
+      console.error("Failed to initialize Firebase:", error)
+    }
   }
   return { app, auth, db }
 }
