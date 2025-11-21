@@ -46,7 +46,13 @@ export function GmailConnectButton({ isConnected }: GmailConnectButtonProps) {
       if (!response.ok) {
         const data = await response.json().catch(() => ({ error: `HTTP ${response.status}` }))
         console.error("[v0] Gmail sync failed:", data)
-        setError(data.error || "Failed to sync emails")
+        
+        // Check if token expired
+        if (data.error?.includes("Token expired") || data.error?.includes("expired")) {
+          setError("Token expired. Please disconnect and reconnect Gmail.")
+        } else {
+          setError(data.error || "Failed to sync emails")
+        }
         return
       }
 
@@ -54,7 +60,11 @@ export function GmailConnectButton({ isConnected }: GmailConnectButtonProps) {
       console.log("[v0] Gmail sync response:", data)
 
       if (data.error) {
-        setError(data.error)
+        if (data.error.includes("Token expired") || data.error.includes("expired")) {
+          setError("Token expired. Please disconnect and reconnect Gmail.")
+        } else {
+          setError(data.error)
+        }
       } else if (data.synced !== undefined) {
         setError(null)
         alert(`Successfully synced ${data.synced} emails!`)
@@ -96,24 +106,37 @@ export function GmailConnectButton({ isConnected }: GmailConnectButtonProps) {
   return (
     <div className="space-y-2">
       {isConnected ? (
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button
-            onClick={handleSync}
-            disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-2 border border-green-500/30 bg-green-500/10 font-mono text-green-500 hover:bg-green-500/20 text-xs sm:text-sm"
-          >
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
-            </svg>
-            {isLoading ? "SYNCING..." : "SYNC_GMAIL"}
-          </Button>
-          <Button
-            onClick={handleDisconnect}
-            disabled={isLoading}
-            className="border border-red-500/30 bg-red-500/10 font-mono text-red-500 hover:bg-red-500/20 text-xs sm:text-sm whitespace-nowrap px-3"
-          >
-            {isLoading ? "..." : "DISCONNECT"}
-          </Button>
+        <div className="space-y-2">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={handleSync}
+              disabled={isLoading}
+              className="flex-1 flex items-center justify-center gap-2 border border-green-500/30 bg-green-500/10 font-mono text-green-500 hover:bg-green-500/20 text-xs sm:text-sm"
+            >
+              <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
+              </svg>
+              {isLoading ? "SYNCING..." : "SYNC_GMAIL"}
+            </Button>
+            <Button
+              onClick={handleDisconnect}
+              disabled={isLoading}
+              className="border border-red-500/30 bg-red-500/10 font-mono text-red-500 hover:bg-red-500/20 text-xs sm:text-sm whitespace-nowrap px-3"
+            >
+              {isLoading ? "..." : "DISCONNECT"}
+            </Button>
+          </div>
+          {error?.includes("Token expired") && (
+            <div className="p-3 border border-yellow-500/30 bg-yellow-500/10 rounded-md">
+              <p className="text-sm text-yellow-400 mb-2">⚠️ {error}</p>
+              <Button
+                onClick={handleDisconnect}
+                className="w-full border border-yellow-500/30 bg-yellow-500/20 font-mono text-yellow-300 hover:bg-yellow-500/30 text-xs"
+              >
+                DISCONNECT & RECONNECT
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <Button
