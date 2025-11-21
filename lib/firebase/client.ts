@@ -7,7 +7,6 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged as firebaseOnAuthStateChanged,
   User,
-  Auth,
 } from "firebase/auth"
 import {
   collection,
@@ -23,45 +22,31 @@ import {
   limit,
   addDoc,
   Timestamp,
-  Firestore,
 } from "firebase/firestore"
 
-// Lazy getters for auth and db
-export const auth: Auth = new Proxy({} as Auth, {
-  get(target, prop) {
-    const authInstance = getFirebaseAuth()
-    if (!authInstance) {
-      throw new Error("Firebase Auth not initialized. Make sure environment variables are set.")
-    }
-    return authInstance[prop as keyof Auth]
-  }
-})
+// Export auth and db as getters
+export const getAuth = () => getFirebaseAuth()
+export const getDb = () => getFirebaseDb()
 
-export const db: Firestore = new Proxy({} as Firestore, {
-  get(target, prop) {
-    const dbInstance = getFirebaseDb()
-    if (!dbInstance) {
-      throw new Error("Firebase Firestore not initialized. Make sure environment variables are set.")
-    }
-    return dbInstance[prop as keyof Firestore]
-  }
-})
+// For backward compatibility, export auth and db that call getters
+export const auth = getFirebaseAuth()
+export const db = getFirebaseDb()
 
-// Wrap auth functions to use lazy getter
-export const signInWithEmailAndPassword = (auth: Auth, email: string, password: string) => {
-  return firebaseSignIn(getFirebaseAuth()!, email, password)
+// Wrap auth functions to always use fresh instances
+export const signInWithEmailAndPassword = (authInstance: any, email: string, password: string) => {
+  return firebaseSignIn(getFirebaseAuth(), email, password)
 }
 
-export const createUserWithEmailAndPassword = (auth: Auth, email: string, password: string) => {
-  return firebaseCreateUser(getFirebaseAuth()!, email, password)
+export const createUserWithEmailAndPassword = (authInstance: any, email: string, password: string) => {
+  return firebaseCreateUser(getFirebaseAuth(), email, password)
 }
 
-export const signOut = (auth: Auth) => {
-  return firebaseSignOut(getFirebaseAuth()!)
+export const signOut = (authInstance: any) => {
+  return firebaseSignOut(getFirebaseAuth())
 }
 
-export const onAuthStateChanged = (auth: Auth, callback: (user: User | null) => void) => {
-  return firebaseOnAuthStateChanged(getFirebaseAuth()!, callback)
+export const onAuthStateChanged = (authInstance: any, callback: (user: User | null) => void) => {
+  return firebaseOnAuthStateChanged(getFirebaseAuth(), callback)
 }
 
 // Re-export Firestore functions directly

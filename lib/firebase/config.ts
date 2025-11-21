@@ -46,20 +46,37 @@ if (typeof window !== "undefined") {
 }
 
 // Export getters to ensure lazy initialization
-export function getFirebaseApp() {
-  initializeFirebase()
-  return app
+export function getFirebaseApp(): FirebaseApp {
+  if (typeof window === "undefined") {
+    throw new Error("Firebase can only be initialized in the browser")
+  }
+  const result = initializeFirebase()
+  if (!result.app) {
+    throw new Error("Firebase App not initialized. Check environment variables.")
+  }
+  return result.app
 }
 
-export function getFirebaseAuth() {
-  initializeFirebase()
-  return auth!
+export function getFirebaseAuth(): Auth {
+  if (typeof window === "undefined") {
+    throw new Error("Firebase Auth can only be initialized in the browser")
+  }
+  const result = initializeFirebase()
+  if (!result.auth) {
+    throw new Error("Firebase Auth not initialized. Check environment variables.")
+  }
+  return result.auth
 }
 
-export function getFirebaseDb() {
-  initializeFirebase()
-  return db!
+export function getFirebaseDb(): Firestore {
+  if (typeof window === "undefined") {
+    throw new Error("Firebase Firestore can only be initialized in the browser")
+  }
+  const result = initializeFirebase()
+  if (!result.db) {
+    throw new Error("Firebase Firestore not initialized. Check environment variables.")
+  }
+  return result.db
 }
 
 export { analytics }
-export { app, auth, db }
