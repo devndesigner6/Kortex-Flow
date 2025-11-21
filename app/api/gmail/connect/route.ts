@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
+  // Use the actual request origin for dynamic URL
+  const appUrl = request.nextUrl.origin
   const redirectUri = `${appUrl}/api/gmail/callback`
 
   console.log("[v0] Gmail OAuth - App URL:", appUrl)

@@ -71,11 +71,25 @@ export async function POST(request: NextRequest) {
           console.log("[v0] Retry response status:", gmailResponse.status)
         } else {
           console.error("[v0] Token refresh returned null")
+          // Clear the invalid tokens
+          await db.collection("profiles").doc(user.id).update({
+            gmail_access_token: null,
+            gmail_refresh_token: null,
+            gmail_connected: false,
+            updated_at: new Date().toISOString()
+          })
           return NextResponse.json({ error: "Token expired. Please reconnect Gmail." }, { status: 401 })
         }
       } catch (refreshError) {
         console.error("[v0] Token refresh error:", refreshError)
-        return NextResponse.json({ error: "Token refresh failed. Please reconnect Gmail." }, { status: 401 })
+        // Clear the invalid tokens
+        await db.collection("profiles").doc(user.id).update({
+          gmail_access_token: null,
+          gmail_refresh_token: null,
+          gmail_connected: false,
+          updated_at: new Date().toISOString()
+        })
+        return NextResponse.json({ error: "Token expired. Please reconnect Gmail." }, { status: 401 })
       }
     }
 
