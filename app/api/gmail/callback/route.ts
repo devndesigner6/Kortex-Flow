@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state") // user_id
   const error = searchParams.get("error")
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
+  // Use the actual request origin for dynamic URL
+  const appUrl = request.nextUrl.origin
   const redirectUri = `${appUrl}/api/gmail/callback`
 
   console.log("[v0] Callback params:", {
@@ -73,6 +74,7 @@ export async function GET(request: NextRequest) {
     await db.collection("profiles").doc(state).update({
       gmail_access_token: tokens.access_token,
       gmail_refresh_token: tokens.refresh_token || null,
+      gmail_connected: true,
       updated_at: new Date().toISOString(),
     })
 
