@@ -1,5 +1,8 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+
 import { auth } from "@/lib/firebase/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
