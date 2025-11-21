@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import type React from "react"
 
-import { auth, signInWithEmailAndPassword } from "@/lib/firebase/client"
+import { getAuth, signInWithEmailAndPassword } from "@/lib/firebase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -35,6 +35,7 @@ export default function LoginPage() {
     try {
       console.log("[v0] Starting login for:", email)
 
+      const auth = getAuth()
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
       

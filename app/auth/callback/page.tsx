@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
-import { auth } from "@/lib/firebase/client"
+import { getAuth } from "@/lib/firebase/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,12 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Only run in browser
+        if (typeof window === "undefined") return
+
+        // Get Firebase Auth instance
+        const auth = getAuth()
+        
         // Firebase handles auth automatically via redirect
         // Just check if user is authenticated
         const user = auth.currentUser

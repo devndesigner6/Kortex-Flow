@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import type React from "react"
 
-import { auth, createUserWithEmailAndPassword, db, doc, setDoc } from "@/lib/firebase/client"
+import { getAuth, getDb, createUserWithEmailAndPassword, doc, setDoc } from "@/lib/firebase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -42,6 +42,9 @@ export default function SignUpPage() {
     try {
       console.log("[v0] Starting signup process for:", email, "with name:", fullName)
 
+      const auth = getAuth()
+      const db = getDb()
+      
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
 
